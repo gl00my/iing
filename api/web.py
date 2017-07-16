@@ -391,7 +391,7 @@ def sticky_list(fname, page=False, msgid=False):
         except:
             None
     if not page:
-        page = msgid and math.ceil(msglist.index(msgid) / 5) or 0
+        page = msgid and math.ceil(msglist.index(msgid) / 50) or 0
         if page == 0:
             page = 1
     return template("tpl/favorite.tpl", nodename=api.nodename, dsc=api.nodedsc, page=int(page), echoarea=ea, msgid=msgid, msglist=result, topiclist=False, background=api.background)
