@@ -336,3 +336,62 @@ def edit_messsage(echoarea, msgid):
         if len(subj) > 0 and len(msgbody) > 0:
             return template("tpl/send.tpl", nodename=api.nodename, dsc=api.nodedsc, message=api.edit_msg(msgid, subj, msgbody), echoarea=echoarea, background=api.background)
     redirect("/")
+
+@route("/favorites")
+@route("/favorites/<msgid>")
+def favorites(msgid = False):
+    api.load_config()
+    favlist = []
+    lst = []
+    for n in os.listdir("favorites"):
+        if n.endswith('txt'):
+            favlist.append(n[0:-4])
+    favlist = reversed(sorted(favlist))
+    for n in favlist:
+            t = open("favorites/" + n + ".txt", "r").readline()
+            lst.append((n, t))
+    return template("tpl/favlist.tpl", nodename = api.nodename, dsc = api.nodedsc, msgid=msgid, favlist=lst, topiclist=False, background = api.background)
+
+@route("/favadd/<fname>/<msgid>")
+def favlist_add(fname, msgid):
+    auth = request.get_cookie("authstr")
+    if not points.is_operator(auth):
+        return redirect("/")
+
+    try:
+        lst = open("favorites/" + fname + ".txt", "r").read().split("\n")
+    except:
+        return redirect("/")
+
+    if not msgid in lst:
+        open("favorites/" + fname + ".txt", "a").write("\n" + msgid)
+    return redirect("/favlist/" + fname + "/" + msgid)
+
+@route("/favlist/<fname>")
+@route("/favlist/<fname>/<msgid>")
+@route("/favlist/<fname>/<msgid>/<page>")
+def sticky_list(fname, page=False, msgid=False):
+    api.load_config()
+    try:
+        msglist = open("favorites/" + fname + ".txt", "r").read().split("\n")
+    except:
+        return redirect("/")
+    ea = [ fname, msglist[0] ];
+    msglist = msglist[1:]
+    result = []
+    for mid in msglist:
+        msg = api.get_msg(mid).split("\n")
+        try:
+            subject = msg[6]
+            f = msg[3]
+            t = msg[5]
+            b = msg[8:]
+            time = msg[2]
+            result.append({"msgid": mid, "subject": subject, "from": f, "to": t, "body": b, "time": time})
+        except:
+            None
+    if not page:
+        page = msgid and math.ceil(msglist.index(msgid) / 5) or 0
+        if page == 0:
+            page = 1
+    return template("tpl/favorite.tpl", nodename=api.nodename, dsc=api.nodedsc, page=int(page), echoarea=ea, msgid=msgid, msglist=result, topiclist=False, background=api.background)

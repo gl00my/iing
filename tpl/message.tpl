@@ -88,6 +88,7 @@
 %end
 <a href="/reply/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
 %if points.is_operator(auth):
+<a href="/favorites/{{msgid}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>
 <a href="/edit/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
 %end
 %if current < len(index) - 1:
