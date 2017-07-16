@@ -8,7 +8,7 @@
 <h3><span class="caption">{{echoarea[1]}}</span></h3>
 %if msgid:
 <div id="rbuttons">
-<a href="/{{msgid}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
+<a href="/favlist/{{echoarea[0]}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
 </div>
 %end
 </div><br>
