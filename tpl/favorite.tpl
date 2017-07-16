@@ -6,11 +6,13 @@
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
 </div>
 <h3><span class="caption">{{echoarea[1]}}</span></h3>
-%if msgid:
 <div id="rbuttons">
+%if msgid:
 <a href="/favlist/{{echoarea[0]}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
-</div>
+%else:
+<a href="/favorites" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
 %end
+</div>
 </div><br>
 
 %if not page:
