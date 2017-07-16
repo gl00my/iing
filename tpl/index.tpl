@@ -57,7 +57,7 @@
 %end
 </div>
 
-<img id="keys" src="lib/buttons.svg">
+<!-- <img id="keys" src="lib/buttons.svg"> -->
 </td>
 <td>
 

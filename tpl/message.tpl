@@ -87,6 +87,9 @@
 <a class="echo-button-disabled"><i class="fa fa-step-backward"></i></a>
 %end
 <a href="/reply/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
+%if points.is_operator(auth):
+<a href="/edit/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
+%end
 %if current < len(index) - 1:
 <a href="/{{next}}" class="echo-button" title="Следующее сообщение"><i class="fa fa-step-forward"></i></a>
 <a href="/{{index[-1]}}" class="echo-button" title="В конец"><i class="fa fa-fast-forward"></i></a>

@@ -289,3 +289,8 @@ def get_fechoarea(fechoarea):
     except:
         None
     return result
+
+def edit_msg(msgid, subj, msgbody):
+    c.execute("UPDATE msg SET subject = ?, body = ? WHERE msgid = ?;", (subj, msgbody, msgid))
+    con.commit()
+    return "msg ok:" + msgid

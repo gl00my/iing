@@ -317,3 +317,22 @@ def pcss(filename):
 @route("/lib/<filename>")
 def plib(filename):
     return static_file(filename, root="lib/")
+
+@route("/edit/<e1>.<e2>/<msgid>")
+def edit(e1, e2, msgid):
+    echoarea = e1 + "." + e2
+    auth = request.get_cookie("authstr")
+    if points.is_operator(auth):
+        msg = api.get_msg(msgid).split("\n")
+        return template("tpl/edit.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background)
+    redirect("/")
+
+@post("/a/editmsg/<echoarea>/<msgid>")
+def edit_messsage(echoarea, msgid):
+    auth = request.get_cookie("authstr")
+    if points.is_operator(auth):
+        subj = request.forms.get("subj")
+        msgbody = request.forms.get("msgbody")
+        if len(subj) > 0 and len(msgbody) > 0:
+            return template("tpl/send.tpl", nodename=api.nodename, dsc=api.nodedsc, message=api.edit_msg(msgid, subj, msgbody), echoarea=echoarea, background=api.background)
+    redirect("/")

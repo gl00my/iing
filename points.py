@@ -69,7 +69,7 @@ def save_point(phash, user, hsh):
 
 def make_point(user, password):
     hs = hsh(user.encode("utf-8") + password.encode("utf-8"))
-    phash = sha(user+salt())
+    phash = hs # sha(user+salt())
     return hs, phash
 
 if __name__ == "__main__":
