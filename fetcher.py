@@ -35,10 +35,12 @@ ue = False
 xc = False
 to = False
 depth = "200"
+bl = []
 
 def load_config():
     auth = ""
     node = ""
+    bl = []
     depth = "200"
     echoareas = []
     fechoareas = []
@@ -53,7 +55,10 @@ def load_config():
             echoareas.append(param[1])
         elif param[0] == "fecho":
             fechoareas.append(param[1])
-    return node, depth, echoareas, fechoareas
+        elif param[0] == "blacklist":
+            bl = open(param[1]).read().splitlines()
+
+    return node, depth, echoareas, fechoareas, bl
 
 def check_directories():
     if not os.path.exists("fecho"):
@@ -187,7 +192,7 @@ def get_mail():
         if echo_filter(line):
             local_index = get_echoarea(line)
         else:
-            if not line in local_index:
+            if not line in local_index and not line in bl:
                 fetch_msg_list.append(line)
     msg_list_len = str(len(fetch_msg_list))
     if len(fetch_msg_list) > 0:
@@ -322,7 +327,7 @@ if not "-n" in args and not "-e" in args and not os.path.exists(config):
 
 check_directories()
 if not "-n" in args or not "-e" in args:
-    node, depth, echoareas, fechoareas = load_config()
+    node, depth, echoareas, fechoareas, bl = load_config()
 print("Работа с " + node)
 print("Получение списка возможностей ноды...")
 get_features()
