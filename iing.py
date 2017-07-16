@@ -428,4 +428,4 @@ api.init()
 if api.web_interface:
     from api.web import *
 
-run(host="0.0.0.0", port=3001)#, quiet=True)
+run(host="0.0.0.0", port=3000, debug = True)#, quiet=True)
