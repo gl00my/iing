@@ -209,11 +209,8 @@ def save_messsage(echoarea, msgid = False):
             msg = msg + msgbody
             msg = base64.b64encode(msg.encode("utf8"))
             message=api.toss_msg(msgfrom, addr, msg)
-            if message.startswith("msg ok:"):
-                msgid = message[7:]
-                redirect("/" + msgid)
-            else:
-                return template("tpl/send.tpl", nodename=api.nodename, dsc=api.nodedsc, message=message, echoarea=echoarea, background=api.background)
+            if message.startswith("msg ok"):
+                redirect("/%s" % message[7:])
         else:
             redirect("/")
 

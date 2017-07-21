@@ -26,7 +26,7 @@
 </script>
 
 <div id="panel">
-<span id="container"><h3 id="nodedsc"><a href="/" style="text-decoration:none; color:inherit;"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
+<span id="container"><h3 id="nodedsc"><a href="/"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 <div id="rbuttons">
 <a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> Избранное</span></a>
