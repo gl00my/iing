@@ -114,4 +114,5 @@
 [{{current + 1}} / {{len(index)}}]
 </div>
 </table>
+<img id="keys" src="lib/buttons.svg">
 %include tpl/footer.tpl

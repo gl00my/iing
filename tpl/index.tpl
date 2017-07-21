@@ -26,11 +26,11 @@
 </script>
 
 <div id="panel">
-<span id="container"><h3 id="nodedsc"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</h3></span>
+<span id="container"><h3 id="nodedsc"><a href="/" style="text-decoration:none; color:inherit;"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 <div id="rbuttons">
 <a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> Избранное</span></a>
-<a href="http://ii-net.tk/" class="button"><i class="fa fa-info-circle"></i><span class="caption"> О нас</span></a>
+<a href="http://instead.syscall.ru/ru/club" class="button"><i class="fa fa-info-circle"></i><span class="caption"> Что это?</span></a>
 %if not nosubscription:
 <a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> Подписки</span></a>
 %end
