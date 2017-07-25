@@ -25,7 +25,7 @@ def index():
             if not flag:
                 subscription.append([ea, ""])
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
-    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True)[0:5]:
+    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True): #[0:5]:
         last = request.get_cookie(echoarea[0], secret='some-secret-key')
         if not last in api.get_echo_msgids(echoarea[0]):
             last = False
