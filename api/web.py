@@ -50,7 +50,7 @@ def index():
         else:
             new = 0
         last = request.get_cookie(echoarea[0], secret='some-secret-key')
-        if not last in api.get_echo_msgids(echoarea[0]):
+        if not last in api.get_echoarea(echoarea[0]):
             last = False
         if not last or len(last) == 0:
             last = api.get_last_msgid(echoarea[0])
@@ -107,7 +107,7 @@ def echolist():
         else:
             new = 0
         last = request.get_cookie(echoarea[0], secret='some-secret-key')
-        if not last in api.get_echo_msgids(echoarea[0]):
+        if not last in api.get_echoarea(echoarea[0]):
             last = False
         if not last or len(last) == 0:
             last = api.get_last_msgid(echoarea[0])
@@ -132,7 +132,7 @@ def ffeed(echoarea, msgid, page):
     msglist = api.get_echoarea(echoarea)
     result = []
     last = request.get_cookie(echoarea, secret='some-secret-key')
-    if not last in api.get_echo_msgids(echoarea):
+    if not last in api.get_echoarea(echoarea):
         last = False
     if not last or len(last) == 0:
         last = api.get_last_msgid(echoarea)
@@ -157,8 +157,10 @@ def ffeed(echoarea, msgid, page):
         ea = ea[0]
     auth = request.get_cookie("authstr")
     if len(msglist) <= end:
-        end = len(msglist)-1
-    response.set_cookie(echoarea, msglist[end], path="/", max_age=180*24*60*60, secret='some-secret-key')
+        end = api.get_last_msgid(echoarea)
+    else:
+        end = msglist[end]
+    response.set_cookie(echoarea, end, path="/", max_age=180*24*60*60, secret='some-secret-key')
     return template("tpl/feed.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=ea, page=page, msgs=result, msgid=msgid, background=api.background, auth=auth)
 
 @route("/<e1>.<e2>")
@@ -174,7 +176,7 @@ def echoreas(e1, e2, msgid=False, page=False):
     else:
         feed = int(feed)
     last = request.get_cookie(echoarea, secret='some-secret-key')
-    if not last in api.get_echo_msgids(echoarea):
+    if not last in api.get_echoarea(echoarea):
         last = False
     if not last or len(last) == 0:
         last = api.get_last_msgid(echoarea)
