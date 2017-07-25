@@ -50,10 +50,20 @@
 <center><b>Список конференций</b></center>
 %for echoarea in allechoareas:
 %if echoarea[2] == 0:
-<a href="/{{echoarea[0]}}" class="new-button-link echo-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i>
+%if feed == 1 and echoarea[3]:
+<a href="/{{echoarea[0]}}/{{echoarea[4]}}/{{echoarea[3]}}#{{echoarea[3]}}" class="new-button-link echo-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i>
  {{echoarea[0]}}<span class="unread">0</span></a>
 %else:
+<a href="/{{echoarea[0]}}" class="new-button-link echo-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i>
+ {{echoarea[0]}}<span class="unread">0</span></a>
+%end
+%else:
+%if feed == 1 and echoarea[3]:
+<a href="/{{echoarea[0]}}/{{echoarea[4]}}/{{echoarea[3]}}#{{echoarea[3]}}" class="new-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i>
+ {{echoarea[0]}}<span class="unread">{{echoarea[2]}}</span></a>
+%else:
 <a href="/{{echoarea[0]}}" class="new-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i> {{echoarea[0]}}<span class="unread">{{echoarea[2]}}</span></a>
+%end
 %end
 %end
 </div>
@@ -64,10 +74,12 @@
 
 %for echoarea in echoareas:
 %last_msgid = api.get_last_msgid(echoarea["echoname"])
-%if last_msgid:
-<h2 class="echo-title"><a href="/{{echoarea["echoname"]}}">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i> {{echoarea["count"]}}</h2>
+%if feed == 1 and echoarea["last"]:
+<a class="echoarea-link" href="/{{echoarea["echoname"]}}/{{echoarea["page"]}}/{{echoarea["last"]}}#{{echoarea["last"]}}"><h2 class="echo-title">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i>
+{{echoarea["count"]}}</h2>
 %else:
-<a class="echoarea-link" href="/{{echoarea["echoname"]}}"><h2 class="echo-title">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i> {{echoarea["count"]}}</h2>
+<a class="echoarea-link" href="/{{echoarea["echoname"]}}"><h2 class="echo-title">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i>
+{{echoarea["count"]}}</h2>
 %end
 %if len(echoarea["msg"]) > 0:
 <div class="message">
