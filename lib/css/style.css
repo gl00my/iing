@@ -419,7 +419,7 @@ textarea {
 .ontop {
     color: #43ac6a;
     position: fixed;
-    left: 0;
+    right: 0;
     bottom: 0;
     opacity: 0.5;
     display: none;
