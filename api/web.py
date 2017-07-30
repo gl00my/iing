@@ -430,8 +430,9 @@ def edit_messsage(echoarea, msgid):
     if points.is_operator(auth):
         subj = request.forms.get("subj")
         msgbody = request.forms.get("msgbody")
-        if len(subj) > 0 and len(msgbody) > 0:
-            return template("tpl/send.tpl", nodename=api.nodename, dsc=api.nodedsc, message=api.edit_msg(msgid, subj, msgbody), echoarea=echoarea, background=api.background)
+        message=api.edit_msg(msgid, subj, msgbody)
+        if message.startswith("msg ok"):
+            redirect("/%s" % message[7:])
     redirect("/")
 
 @route("/favorites")
