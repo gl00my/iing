@@ -62,7 +62,6 @@ def index():
         last = api.get_last_msgid(echoarea[0])
         page = get_page(len(api.get_echoarea(echoarea[0])))
         echoareas.append({"echoname": echoarea[0], "count": api.get_echoarea_count(echoarea[0]), "dsc": echoarea[1], "msg": api.get_last_msg(echoarea[0]), "last": last, "page": page})
-
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
     msgfrom, addr = points.check_point(auth)
