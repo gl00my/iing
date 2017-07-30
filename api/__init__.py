@@ -176,6 +176,23 @@ def fhsh(msg):
     ret = base64.urlsafe_b64encode(hashlib.sha256(msg).digest()).decode("utf-8").replace("-", "A").replace("_", "z")[:20]
     return ret
 
+def spoiler(msg):
+    lines = msg.split("\n")
+    rmsg = lines[0:8]
+    sp = False
+    lastsp = ""
+    for line in lines[8:]:
+        if sp:
+            lastsp += line
+        elif line.strip() == "%%spoiler%%":
+            sp = True
+        else:
+            rmsg.append(line)
+    if sp and len(lastsp.strip()) > 0:
+        rmsg.append("// base64 spoiler")
+        rmsg.append(base64.b64encode(lastsp.encode("utf-8")).decode("utf-8"))
+    return "\n".join(rmsg)
+
 def toss_msg(msgfrom, addr, tmsg):
     try:
         rawmsg = base64.b64decode(tmsg).decode("utf-8").split("\n")
@@ -202,6 +219,7 @@ def toss_msg(msgfrom, addr, tmsg):
     if echo_filter(echoarea):
         if msg:
             if len(msg) <= 65535:
+                msg = spoiler(msg)
                 h = hsh(msg)
                 msg = msg.split("\n")
                 c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (h, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
