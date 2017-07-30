@@ -1,4 +1,5 @@
 import os, re, time, math, codecs, base64, hashlib, sqlite3
+from textwrap import wrap
 
 con = sqlite3.connect("idec.db")
 c = con.cursor()
@@ -190,7 +191,8 @@ def spoiler(msg):
             rmsg.append(line)
     if sp and len(lastsp.strip()) > 0:
         rmsg.append("// base64 spoiler")
-        rmsg.append(base64.b64encode(lastsp.encode("utf-8")).decode("utf-8"))
+        w  = "\n".join(wrap(base64.b64encode(lastsp.encode("utf-8")).decode("utf-8"), 50))
+        rmsg.append(w)
     return "\n".join(rmsg)
 
 def toss_msg(msgfrom, addr, tmsg):
