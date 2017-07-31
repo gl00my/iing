@@ -177,12 +177,11 @@ def fhsh(msg):
     ret = base64.urlsafe_b64encode(hashlib.sha256(msg).digest()).decode("utf-8").replace("-", "A").replace("_", "z")[:20]
     return ret
 
-def spoiler(msg):
-    lines = msg.split("\n")
-    rmsg = lines[0:8]
+def spoiler_body(msg):
     sp = False
     lastsp = ""
-    for line in lines[8:]:
+    rmsg = []
+    for line in msg.split("\n"):
         if sp:
             lastsp += line
         elif line.strip() == "%%spoiler%%":
@@ -191,8 +190,14 @@ def spoiler(msg):
             rmsg.append(line)
     if sp and len(lastsp.strip()) > 0:
         rmsg.append("// base64 spoiler")
-        w  = "\n".join(wrap(base64.b64encode(lastsp.encode("utf-8")).decode("utf-8"), 50))
+        w  = " ".join(wrap(base64.b64encode(lastsp.encode("utf-8")).decode("utf-8"), 16))
         rmsg.append(w)
+    return "\n".join(rmsg)
+
+def spoiler_msg(msg):
+    lines = msg.split("\n")
+    rmsg = lines[0:8]
+    rmsg.append(spoiler_body("\n".join(lines[8:])))
     return "\n".join(rmsg)
 
 def toss_msg(msgfrom, addr, tmsg):
@@ -221,7 +226,7 @@ def toss_msg(msgfrom, addr, tmsg):
     if echo_filter(echoarea):
         if msg:
             if len(msg) <= 65535:
-                msg = spoiler(msg)
+                msg = spoiler_msg(msg)
                 h = hsh(msg)
                 msg = msg.split("\n")
                 c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (h, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
@@ -322,6 +327,7 @@ def get_fechoarea(fechoarea):
     return result
 
 def edit_msg(msgid, subj, msgbody):
+    msgbody = spoiler_body(msgbody)
     c.execute("UPDATE msg SET subject = ?, body = ? WHERE msgid = ?;", (subj, msgbody, msgid))
     con.commit()
     return "msg ok:" + msgid
