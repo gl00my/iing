@@ -17,5 +17,13 @@
   %import random
   %image = random.choice(background)
   <body style="background: url(/lib/{{image}}) no-repeat; background-size: cover; -webkit-background-size: cover; background-attachment: fixed;">
-    <i id="ontop" class="fa fa-arrow-circle-up fa-2x ontop" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;"></i>
+    <div id="ontop" class="ontop">
+     <div id="bottom-buttons">
+      <a href="/" class="bbutton"><i class="fa fa-home"></i></a>
+%if defined('echoarea'):
+      <a href="/new/{{echoarea[0]}}" class="bbutton"><i class="fa fa-plus-circle"></i></a>
+%end
+      <i class="fa fa-arrow-circle-up bbutton" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;"></i>
+     </div>
+    </div>
     <center>
