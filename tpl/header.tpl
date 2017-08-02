@@ -20,7 +20,7 @@
     <div id="ontop" class="ontop">
      <div id="bottom-buttons">
       <a href="/" class="bbutton"><i class="fa fa-home"></i></a>
-%if defined('echoarea'):
+%if defined('echoarea') and echoarea:
       <a href="/new/{{echoarea[0]}}" class="bbutton"><i class="fa fa-plus-circle"></i></a>
 %end
       <i class="fa fa-arrow-circle-up bbutton" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;"></i>
