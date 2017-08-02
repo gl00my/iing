@@ -34,11 +34,12 @@
 <center>
 %if msgid:
 <form method="post" enctype="multipart/form-data" action="/a/savemsg/{{echoarea}}/{{msgid}}">
+<input type="hidden" name="to" value="{{to}}">
 %else:
 <form method="post" enctype="multipart/form-data" action="/a/savemsg/{{echoarea}}">
+<input type="text" name="to" class="input input_line" placeholder="Кому" value="{{to}}"><br>
 %end
 <input type="hidden" name="repto" value="{{repto}}">
-<input type="hidden" name="to" value="{{to}}">
 %if subj:
 <input type="text" name="subj" class="input input_line" placeholder="Тема сообщения" value="{{subj}}"><br>
 %else:
