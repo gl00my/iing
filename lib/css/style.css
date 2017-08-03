@@ -417,7 +417,7 @@ textarea {
 }
 
 #bottom-buttons {
-    border: 1px solid #585858;
+    border: 0px solid #585858;
     position: fixed;
     right: 0;
     bottom: 0;

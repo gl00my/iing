@@ -34,29 +34,46 @@ def echoes(subscription):
         allechoareas.append(temp)
     return allechoareas
 
+def subscriptions():
+    api.load_config()
+    if api.nosubscription:
+        subscription = api.subscribes
+        if len(subscription) == 0:
+            return api.echoareas
+    else:
+        subscription = request.get_cookie("subscription", secret='some-secret-key')
+
+    flag = False
+
+    if not subscription:
+        subscription = []
+        for ea in api.subscribes:
+            subscription.append(ea)
+
+        if len(api.subscribes) == 0:
+            for ea in api.echoareas:
+                subscription.append(ea[0])
+        flag = True
+    else:
+        for ea in api.subscribes:
+            if not (ea in subscription):
+                flag = True
+                subscription.append(ea)
+    if flag:
+        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
+
+    s = subscription
+    subscription = []
+    for ea in s:
+        for e in api.echoareas:
+            if ea in e:
+                subscription.append(e)
+    return subscription
+
 @route("/")
 def index():
-    api.load_config()
     echoareas = []
-    s = request.get_cookie("subscription", secret='some-secret-key')
-    if not s:
-        subscription = []
-        for ea in api.echoareas:
-            subscription.append(ea[0])
-        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
-        s = subscription
-    if api.nosubscription:
-        subscription = api.echoareas
-    else:
-        subscription = []
-        for ea in s:
-            flag = False
-            for e in api.echoareas:
-                if ea in e:
-                    flag = True
-                    subscription.append(e)
-            if not flag:
-                subscription.append([ea, ""])
+    subscription = subscriptions()
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
     for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True): #[0:5]:
         last = api.get_last_msgid(echoarea[0])
@@ -74,27 +91,8 @@ def index():
 
 @route("/echolist")
 def echolist():
-    api.load_config()
     echoareas = []
-    s = request.get_cookie("subscription", secret='some-secret-key')
-    if not s:
-        subscription = []
-        for ea in api.echoareas:
-            subscription.append(ea[0])
-        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
-        s = subscription
-    if api.nosubscription:
-        subscription = api.echoareas
-    else:
-        subscription = []
-        for ea in s:
-            flag = False
-            for e in api.echoareas:
-                if ea in e:
-                    flag = True
-                    subscription.append(e)
-            if not flag:
-                subscription.append([ea, ""])
+    subscription = subscriptions()
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
     msgfrom, addr = points.check_point(auth)
@@ -296,8 +294,11 @@ def subscription():
     s = request.forms.get("subscription")
     subscription = []
     if request.forms.get("default"):
-        for ea in api.echoareas:
-            subscription.append(ea[0])
+        for ea in api.subscribes:
+            subscription.append(ea)
+        if len(subscription) == 0:
+            for ea in api.echoareas:
+                subscription.append(ea[0])
         response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
         redirect("/")
     if s:

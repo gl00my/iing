@@ -53,12 +53,14 @@ def init():
 
 def load_config():
     global nodename, nodedsc, nodeurl, echoareas, fechoareas, shortareas, web_interface, background, norobots, registration, nosubscription
+    global subscribes
     nodename = ""
     nodedsc = ""
     nodeurl = ""
     background = []
     echoareas = []
     fechoareas = []
+    subscribes = []
     shortareas = []
     web_interface = True
     norobots = False
@@ -76,6 +78,8 @@ def load_config():
             nodeurl = " ".join(param[1:])
         elif param[0] == "echo":
             echoareas.append([param[1], " ".join(param[2:])])
+        elif param[0] == "subscribe":
+            subscribes.append(param[1])
         elif param[0] == "fecho":
             fechoareas.append([param[1], " ".join(param[2:])])
         elif param[0] == "webinterface":
