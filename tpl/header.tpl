@@ -10,20 +10,18 @@
     <script>
       window.onscroll = function() {
       var top = document.body.scrollTop + document.documentElement.scrollTop == 0;
-      document.getElementById('ontop').style.display = top ? 'none' : 'block';
+      document.getElementById('bottom-buttons').style.display = top ? 'none' : 'block';
       }
     </script>
   </head>
   %import random
   %image = random.choice(background)
   <body style="background: url(/lib/{{image}}) no-repeat; background-size: cover; -webkit-background-size: cover; background-attachment: fixed;">
-    <div id="ontop" class="ontop">
-     <div id="bottom-buttons">
-      <a href="/" class="bbutton"><i class="fa fa-home"></i></a>
+    <div id="bottom-buttons">
+    <a href="/" title="Главная"><i class="fa fa-home fa-2x bbutton"></i></a>
 %if defined('echoarea') and echoarea:
-      <a href="/new/{{echoarea[0]}}" class="bbutton"><i class="fa fa-plus-circle"></i></a>
+    <a href="/new/{{echoarea[0]}}" title="Новое сообщение"><i class="fa fa-plus-circle fa-2x bbutton"></i></a>
 %end
-      <i class="fa fa-arrow-circle-up bbutton" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;"></i>
-     </div>
+    <i class="fa fa-arrow-circle-up fa-2x bbutton" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;" title="Наверх"></i>
     </div>
     <center>
