@@ -493,3 +493,26 @@ def sticky_list(fname, page=False, msgid=False):
         if page == 0:
             page = 1
     return template("tpl/favorite.tpl", nodename=api.nodename, dsc=api.nodedsc, page=int(page), echoarea=ea, msgid=msgid, msglist=result, topiclist=False, background=api.background)
+
+@post("/search/<e1>.<e2>")
+def search(e1, e2):
+    api.load_config()
+    auth = request.get_cookie("authstr")
+    messages = []
+    echoarea = e1 + "." + e2
+    regexp = request.forms.get("regexp")
+    p = re.compile(regexp, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    if not p:
+        return redirect("/");
+    found = 0
+    echoarea_msglist = reversed(api.get_echoarea(echoarea))
+    for msgid in echoarea_msglist:
+        msg = api.get_msg(msgid);
+        if p.search(msg):
+            msg = msg.split("\n")
+            messages.append([msgid, msg])
+            found += 1;
+            if found >= 100:
+                break;
+    echo = [echoarea, "["+str(found)+"] // " + regexp];
+    return template("tpl/query.tpl", nodename=api.nodename, dsc=api.nodedsc, page=1, msgs=messages, echoarea = echo, msgid=False, background=api.background, auth = auth)

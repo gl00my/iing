@@ -67,6 +67,17 @@ html, body {
     text-transform: uppercase;
 }
 
+.query {
+    background: #333333;
+    display: inline-block;
+    font-size: 11pt;
+    line-height: 40pt;
+    text-decoration: none;
+    text-align: left;
+    color: #000000;
+    padding: 0 15px;
+}
+
 .button:hover {
     background: #008cba;
     color: #FFFFFF;
