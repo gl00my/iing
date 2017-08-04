@@ -30,7 +30,7 @@
 {{ea}}
 %end
 </textarea><br>
-<label><input type="checkbox" name="default" value="1">Вернуться к списку конференций по-умолчанию</label><br><br>
+<label><input type="checkbox" name="default" value="1">Добавить все тематические эхи</label><br><br>
 <button class="form-button">Сохранить</button>
 </form>
 </div>

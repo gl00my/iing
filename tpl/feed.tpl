@@ -60,7 +60,14 @@
 <b>Кому:</b> {{to}}<br>
 <b>Тема:</b> {{subj}}
 </div>
+
+%if len(body) <= 16:
 {{!api.body_render("\n".join(body))}}
+%else:
+{{!api.body_render("\n".join(body[0:16]))}}
+<br><br><a href="/{{msgid}}">Читать далее</a>
+%end
+
 </div><br>
 %end
 </table>

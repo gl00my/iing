@@ -85,10 +85,11 @@
 <div class="message">
 %#<h3 class="message-title">{{echoarea["msg"][6]}}</h3>
 <b title="{{echoarea["msg"][4]}}">{{echoarea["msg"][3]}}</b> to {{echoarea["msg"][5]}} @ {{echoarea["msg"][6]}} <i class="fa fa-clock-o"></i>  {{api.formatted_time(echoarea["msg"][2])}}<br><br>
-%if len(echoarea["msg"][8:]) <= 10:
-%body = api.body_render("\n".join(echoarea["msg"][7:]))
+%body = echoarea["msg"][7].split("\n")
+%if len(body) <= 10:
+%body = api.body_render("\n".join(body))
 %else:
-%body = api.body_render("\n".join(echoarea["msg"][7:12])) + "<br><br><a href=" + last_msgid + ">Читать далее</a>"
+%body = api.body_render("\n".join(body[0:10])) + "<br><br><a href=" + last_msgid + ">Читать далее</a>"
 %end
 {{!body}}
 </div>
