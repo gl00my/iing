@@ -22,12 +22,14 @@ def echoes(subscription):
 
         if new > 0:
             last = echoarea_msglist[-new];
-        else:
+        elif len(echoarea_msglist) > 0:
             last = echoarea_msglist[-1];
+        else:
+            last = False
 
         temp.append(new)
         temp.append(last)
-        if len(last) > 0:
+        if last:
             temp.append(get_page(api.get_echoarea(echoarea[0]).index(last)))
         else:
             temp.append(get_page(len(api.get_echoarea(echoarea[0]))))
