@@ -12,7 +12,7 @@
 <h3><span class="caption"><i class="fa fa-comments"></i> {{echoarea[0]}}: {{echoarea[1]}}</span></h3>
 %end
 <div id="rbuttons">
-<form id="search" class="query" method="post" enctype="multipart/form-data" action="/search/{{echoarea[0]}}"><input class="input_line" id="query" name="regexp" placeholder="regexp" value="" type="text"/></form>
+<form id="search" class="query" method="get" action="/search/{{echoarea[0]}}"><input class="input_line" id="query" name="regexp" placeholder="regexp" value="" type="text"/></form>
 %if feed == 0:
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>
 %end
