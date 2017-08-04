@@ -507,9 +507,9 @@ def search(e1, e2):
     found = 0
     echoarea_msglist = reversed(api.get_echoarea(echoarea))
     for msgid in echoarea_msglist:
-        msg = api.get_msg(msgid);
-        if p.search(msg):
-            msg = msg.split("\n")
+        msg = api.get_msg(msgid).split("\n")
+        msgp = "\n".join(msg[3:])
+        if p.search(msgp):
             messages.append([msgid, msg])
             found += 1;
             if found >= 100:
