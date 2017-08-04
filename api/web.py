@@ -501,8 +501,9 @@ def search(e1, e2):
     messages = []
     echoarea = e1 + "." + e2
     regexp = request.query.regexp
-    p = re.compile(regexp, re.IGNORECASE | re.MULTILINE | re.DOTALL)
-    if not p:
+    try:
+        p = re.compile(regexp, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    except:
         return redirect("/");
     found = 0
     echoarea_msglist = reversed(api.get_echoarea(echoarea))
