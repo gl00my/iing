@@ -26,13 +26,6 @@ def set_last_cookie(e, msg):
 def echoes(subscription):
     allechoareas = []
 
-    auth = request.get_cookie("authstr")
-    username, addr = points.check_point(auth)
-
-    if username:
-        subscription.append(["mail.to@"+username, "CC"])
-        subscription.append(["mail.from@"+username, "Отправленные"])
-
     for echoarea in subscription:
         temp = echoarea
 
@@ -108,6 +101,14 @@ def subscriptions():
         for e in api.echoareas:
             if ea in e:
                 subscription.append(e)
+
+    auth = request.get_cookie("authstr")
+    username, addr = points.check_point(auth)
+
+    if username:
+        subscription.append(["mail.to@"+username, "CC"])
+        subscription.append(["mail.from@"+username, "Отправленные"])
+
     return subscription
 
 @route("/")
@@ -128,6 +129,17 @@ def index():
     else:
         feed = int(feed)
     return template("tpl/index.tpl", nodename=api.nodename, dsc=api.nodedsc, echoareas=echoareas, allechoareas=allechoareas, addr=addr, auth=auth, background=api.background, nosubscription=api.nosubscription, feed=feed)
+
+@route("/readall")
+def readall():
+    echoareas = []
+    subscription = subscriptions()
+    last = {}
+    for ea in subscription:
+        last[ea[0]] = api.get_last_msgid(ea[0])
+
+    response.set_cookie("last", last, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    return redirect("/")
 
 @route("/echolist")
 def echolist():
