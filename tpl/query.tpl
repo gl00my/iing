@@ -54,7 +54,7 @@
 {{!api.body_render("\n".join(body))}}
 %else:
 {{!api.body_render("\n".join(body[0:16]))}}
-<br><br><a href="/{{msgid}}">Читать далее</a>
+<br><br><a href="/{{msg[0]}}">Читать далее</a>
 %end
 
 </div><br>
