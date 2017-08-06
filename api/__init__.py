@@ -95,8 +95,36 @@ def load_config():
             registration = True
         elif param[0] == "nosubscription":
             nosubscription = True
+# 0 - echo
+# 1 - args
+# 2 - name
+# 3 - decoded args
+
+def is_vea(echo, m = False):
+    global virtual_ea
+    if not ('@' in echo):
+        return False
+    ea = echo.split("@", 1)
+    if ea[0] in virtual_ea:
+        if not m or m in virtual_ea[ea[0]]:
+            ea.append(virtual_ea[ea[0]]['name'])
+            if 'decode' in virtual_ea[ea[0]]:
+                ea.append(virtual_ea[ea[0]]['decode'](ea[1]))
+            else:
+                ea.append(ea[1])
+            return ea
+    return False
+
+def vea_call(vea, m):
+    global virtual_ea
+    if m in virtual_ea[vea[0]]:
+        return virtual_ea[vea[0]][m](vea[1])
 
 def get_echo_msgids(echo):
+    vea = is_vea(echo, 'get_echo_msgids')
+    if vea:
+        return vea_call(vea, 'get_echo_msgids')
+
     msgids = []
     for row in c.execute("SELECT msgid FROM msg WHERE echoarea = ? ORDER BY id;", (echo,)):
         if len(row[0]) > 0:
@@ -104,12 +132,14 @@ def get_echo_msgids(echo):
     return msgids
 
 def get_echoarea(echoarea):
+    vea = is_vea(echoarea, 'get_echoareas')
+    if vea:
+        return vea_call(vea, 'get_echoareas')
+
     try:
-        blacklist = open("blacklist.txt", "r").read().split("\n")
         result = []
         for msgid in get_echo_msgids(echoarea):
-            if msgid != "" and not msgid in blacklist:
-                result.append(msgid)
+            result.append(msgid)
         return result
     except:
         return []
@@ -122,15 +152,21 @@ def get_msg(msgid):
         return ""
 
 def get_echoarea_count(echoarea):
+    vea = is_vea(echoarea, 'get_echoarea_count')
+    if vea:
+        return vea_call(vea, 'get_echoarea_count')
+
     r = 0
-    blacklist = open("blacklist.txt", "r").read().split("\n")
     q = c.execute("SELECT msgid FROM msg WHERE echoarea = ?;", (echoarea,))
     for row in q:
-        if not row[0] in blacklist:
-            r += 1
+        r += 1
     return r
 
 def get_last_msg(echoarea):
+    vea = is_vea(echoarea, 'get_last_msg')
+    if vea:
+        return vea_call(vea, 'get_last_msg')
+
     try:
         row = c.execute("SELECT tags, echoarea, time, fr, addr, t, subject, body FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()
         msg = [row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], row[7]]
@@ -139,6 +175,10 @@ def get_last_msg(echoarea):
     return msg
 
 def get_last_msgid(echoarea):
+    vea = is_vea(echoarea, 'get_last_msgid')
+    if vea:
+        return vea_call(vea, 'get_last_msgid')
+
     try:
         return c.execute("SELECT msgid FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()[0]
     except:
@@ -245,6 +285,9 @@ def toss_msg(msgfrom, addr, tmsg):
             if len(msg) <= 65535:
                 msg = spoiler_msg(msg)
                 h = hsh(msg)
+                l = get_echo_msgids(echoarea)
+                if h in l:
+                    return "error:duplicate msgid"
                 msg = msg.split("\n")
                 c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (h, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
                 con.commit()
@@ -276,6 +319,8 @@ def body_render(body):
     body = "<br>\n".join(body.split("\n"))
     txt = ""; pre = 0
     for line in body.split("\n"):
+        if not (" " in line) and len(line) > 60:
+            line = " ".join(wrap(line, 60))
         if line.startswith("====") and pre == 0:
             pre = 1
             txt += "<pre>====\n"
@@ -348,3 +393,122 @@ def edit_msg(msgid, subj, msgbody):
     c.execute("UPDATE msg SET subject = ?, body = ? WHERE msgid = ?;", (subj, msgbody, msgid))
     con.commit()
     return "msg ok:" + msgid
+
+def mail_last_msgid(arg):
+    to = arg
+    if not to:
+        return False
+    try:
+        return c.execute("SELECT msgid FROM msg WHERE t = ? ORDER BY id DESC LIMIT 1;", (to,)).fetchone()[0]
+    except:
+        return False
+
+def mail_echo_msgids(arg):
+    msgids = []
+    to = arg
+    if not to:
+        return msgids
+    for row in c.execute("SELECT msgid FROM msg WHERE t = ? ORDER BY id;", (to,)):
+        msgids.append(row[0])
+    return msgids
+
+def mail_echoarea_count(arg):
+    r = 0
+    to = arg
+    if not to:
+        return 0;
+    q = c.execute("SELECT msgid FROM msg WHERE t = ?;", (to,))
+    for row in q:
+        r += 1
+    return r
+
+def from_last_msgid(arg):
+    fr = arg
+    if not fr:
+        return False
+    try:
+        return c.execute("SELECT msgid FROM msg WHERE fr = ? ORDER BY id DESC LIMIT 1;", (fr,)).fetchone()[0]
+    except:
+        return False
+
+def from_echo_msgids(arg):
+    msgids = []
+    fr = arg
+    if not fr:
+        return msgids
+    for row in c.execute("SELECT msgid FROM msg WHERE fr = ? ORDER BY id;", (fr,)):
+        msgids.append(row[0])
+    return msgids
+
+def from_echoarea_count(arg):
+    r = 0
+    fr = arg
+    if not fr:
+        return 0;
+    q = c.execute("SELECT msgid FROM msg WHERE fr = ?;", (fr,))
+    for row in q:
+        r += 1
+    return r
+
+def query_echo_msgids(arg, cache = False):
+    if cache and arg in virtual_ea['.query']['cache']:
+        return virtual_ea['.query']['cache'][arg]
+    regexp = arg.rsplit('@', 1)[1]
+    regexp = base64.urlsafe_b64decode(regexp).decode("utf-8")
+    echoarea = arg.rsplit('@', 1)[0]
+    messages = []
+    try:
+        p = re.compile(regexp, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    except:
+        return messages
+    echoarea_msglist = get_echoarea(echoarea)
+
+    for msgid in echoarea_msglist:
+        msg = get_msg(msgid).split("\n")
+        msgp = "\n".join(msg[3:])
+        if p.search(msgp):
+            messages.append(msgid)
+    virtual_ea['.query']['cache'][arg] = messages
+    return messages
+
+def query_echoarea_count(arg):
+    msgs = query_echo_msgids(arg, True)
+    return len(msgs)
+
+def query_last_msgid(arg):
+    msgs = query_echo_msgids(arg, True)
+    if len(msgs) <= 0:
+        return False
+    return msgs[-1];
+
+def query_decode(arg):
+    regexp = arg.rsplit('@', 1)[1]
+    regexp = base64.urlsafe_b64decode(regexp).decode("utf-8")
+    echoarea = arg.rsplit('@', 1)[0]
+    vea = is_vea(echoarea)
+    if vea:
+        echoarea = vea[3]
+    return echoarea + "//" + regexp
+
+virtual_ea = {
+    'mail.to' : {
+        'name': 'Для',
+        'get_last_msgid': mail_last_msgid,
+        'get_echo_msgids': mail_echo_msgids,
+        'get_echoarea_count': mail_echoarea_count,
+    },
+    'mail.from' : {
+        'name': 'От',
+        'get_last_msgid': from_last_msgid,
+        'get_echo_msgids': from_echo_msgids,
+        'get_echoarea_count': from_echoarea_count,
+    },
+    '.query' : {
+        'name': 'Поиск',
+        'cache' : { },
+        'decode': query_decode,
+        'get_last_msgid': query_last_msgid,
+        'get_echo_msgids': query_echo_msgids,
+        'get_echoarea_count': query_echoarea_count,
+    },
+}

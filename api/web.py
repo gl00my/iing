@@ -1,24 +1,53 @@
-import api, points, base64, math
+import api, points, base64, math, urllib
 from api.bottle import *
 
 def get_page(n):
+    if n == 0:
+        return 1
     return math.ceil(n / 50)
+
+def get_last_cookie(e):
+    if e.startswith('.'):
+        return False
+    last = request.get_cookie("last", secret='some-secret-key')
+    if not last or not (e in last):
+        return False
+    return last[e]
+
+def set_last_cookie(e, msg):
+    if e.startswith('.'):
+        return
+    last = request.get_cookie("last", secret='some-secret-key')
+    if not (type(last) is dict):
+        last = {}
+    last[e] = msg
+    response.set_cookie("last", last, path="/", max_age=180*24*60*60, secret='some-secret-key')
 
 def echoes(subscription):
     allechoareas = []
+
+    auth = request.get_cookie("authstr")
+    username, addr = points.check_point(auth)
+
+    if username:
+        subscription.append(["mail.to@"+username, "CC"])
+        subscription.append(["mail.from@"+username, "Отправленные"])
+
     for echoarea in subscription:
         temp = echoarea
-        if not request.get_cookie(echoarea[0]):
-            response.set_cookie(echoarea[0], api.get_last_msgid(echoarea[0]), path="/", max_age=180*24*60*60, secret='some-secret-key')
-        current = request.get_cookie(echoarea[0], secret='some-secret-key')
-        if not current:
-            current = api.get_last_msgid(echoarea[0])
+
+        current = get_last_cookie(echoarea[0])
+
         echoarea_msglist = api.get_echoarea(echoarea[0])
 
-        if len(echoarea_msglist) > 0 and current in echoarea_msglist:
+        if current in echoarea_msglist:
             new = int(api.get_echoarea_count(echoarea[0])) - echoarea_msglist.index(current) - 1
         else:
             new = 0
+            current = False
+
+        if not current and new == 0 and len(echoarea_msglist) > 0:
+            new = len(echoarea_msglist)
 
         if new > 0:
             last = echoarea_msglist[-new];
@@ -29,11 +58,20 @@ def echoes(subscription):
 
         temp.append(new)
         temp.append(last)
+
         if last:
             temp.append(get_page(api.get_echoarea(echoarea[0]).index(last)))
         else:
             temp.append(get_page(len(api.get_echoarea(echoarea[0]))))
+
+        vea = api.is_vea(echoarea[0])
+        if vea:
+            temp.append(vea[2] + ": " + vea[3])
+        else:
+            temp.append(echoarea[0])
+
         allechoareas.append(temp)
+
     return allechoareas
 
 def subscriptions():
@@ -109,11 +147,7 @@ def ffeed(echoarea, msgid, page):
     api.load_config()
     msglist = api.get_echoarea(echoarea)
     result = []
-    last = request.get_cookie(echoarea, secret='some-secret-key')
-    if not last in api.get_echoarea(echoarea):
-        last = False
-    if not last or len(last) == 0:
-        last = api.get_last_msgid(echoarea)
+    last = msgid
     if not page:
         if not last:
             page = get_page(len(msglist))
@@ -133,43 +167,47 @@ def ffeed(echoarea, msgid, page):
         ea = [echoarea, ""]
     else:
         ea = ea[0]
+    vea =  api.is_vea(ea[0])
+    if vea:
+        ea[1] = vea[3]
+        ea.append(vea[2])
+    else:
+        ea.append(ea[0])
+
     auth = request.get_cookie("authstr")
     if len(msglist) <= end:
         end = api.get_last_msgid(echoarea)
     else:
         end = msglist[end]
-    response.set_cookie(echoarea, end, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    set_last_cookie(echoarea, end)
+
     return template("tpl/feed.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=ea, page=page, msgs=result, msgid=msgid, background=api.background, auth=auth)
 
 @route("/<e1>.<e2>")
 @route("/<e1>.<e2>/<page>")
 @route("/<e1>.<e2>/<page>/<msgid>")
-def echoreas(e1, e2, msgid=False, page=False):
+def echoareas(e1, e2, msgid=False, page=False):
     echoarea=e1 + "." + e2
-    if not request.get_cookie(echoarea):
-        response.set_cookie(echoarea, api.get_last_msgid(echoarea), max_age=180*24*60*60, secret='some-secret-key')
+    if not get_last_cookie(echoarea):
+        set_last_cookie(echoarea, api.get_last_msgid(echoarea));
     feed = request.get_cookie("feed", secret='some-secret-key')
-    if not feed:
+    if not feed or api.is_vea(echoarea):
         feed = 1
     else:
         feed = int(feed)
-    last = msgid or request.get_cookie(echoarea, secret='some-secret-key')
+    last = msgid or get_last_cookie(echoarea)
     if not last in api.get_echoarea(echoarea):
         last = False
-    if not last or len(last) == 0:
+    if not last:
         last = api.get_last_msgid(echoarea)
     index = api.get_echoarea(echoarea)
     if feed == 0 and len(index) > 0 and index[-1] != last and last in index:
         last = index[index.index(last) + 1]
     if len(index) == 0:
         last = False
+
     if echoarea != "favicon.ico":
-        if last:
-            feed = request.get_cookie("feed", secret='some-secret-key')
-            if not feed:
-                feed = 1
-            else:
-                feed = int(feed)
+        if last or api.is_vea(echoarea):
             if feed == 0:
                 redirect("/" + last)
             else:
@@ -205,7 +243,7 @@ def showmsg(msgid):
             body = body[8:]
             index = api.get_echoarea(echoarea[0])
             current = index.index(msgid)
-            response.set_cookie(echoarea[0], msgid, max_age=180*24*60*60, secret='some-secret-key')
+            set_last_cookie(echoarea[0], msgid)
             auth = request.get_cookie("authstr")
             feed = request.get_cookie("feed", secret='some-secret-key')
             if not feed:
@@ -256,6 +294,8 @@ def msg_list(echoarea, page=False, msgid=False):
 @route("/reply/<e1>.<e2>/<msgid>")
 def reply(e1, e2, msgid = False):
     echoarea = e1 + "." + e2
+    if api.is_vea(echoarea):
+        return redirect("/")
     auth = request.get_cookie("authstr")
     if msgid:
         msg = api.get_msg(msgid).split("\n")
@@ -496,24 +536,7 @@ def sticky_list(fname, page=False, msgid=False):
 
 @route("/search/<e1>.<e2>")
 def search(e1, e2):
-    api.load_config()
-    auth = request.get_cookie("authstr")
-    messages = []
     echoarea = e1 + "." + e2
     regexp = request.query.regexp
-    try:
-        p = re.compile(regexp, re.IGNORECASE | re.MULTILINE | re.DOTALL)
-    except:
-        return redirect("/");
-    found = 0
-    echoarea_msglist = reversed(api.get_echoarea(echoarea))
-    for msgid in echoarea_msglist:
-        msg = api.get_msg(msgid).split("\n")
-        msgp = "\n".join(msg[3:])
-        if p.search(msgp):
-            messages.append([msgid, msg])
-            found += 1;
-            if found >= 100:
-                break;
-    echo = [echoarea, "["+str(found)+"] // " + regexp];
-    return template("tpl/query.tpl", nodename=api.nodename, dsc=api.nodedsc, page=1, msgs=messages, echoarea = echo, msgid=False, background=api.background, auth = auth)
+    regexp = base64.urlsafe_b64encode(regexp.encode("utf-8")) #.decode("utf-8")
+    return redirect("/.query@"+ urllib.parse.quote(echoarea) + "@" + urllib.parse.quote(regexp))

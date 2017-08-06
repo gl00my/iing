@@ -1,6 +1,7 @@
 %include tpl/header.tpl nodename=nodename, dsc=dsc, hidemenu=True, background=background
 %if msgid:
 %title="Ответ на " + msgid
+%echoarea=msg[1]
 %#msg = open("msg/" + msgid, "r").read().split("\n")
 %repto = msgid
 %to = msg[3]

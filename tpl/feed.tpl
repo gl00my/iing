@@ -6,11 +6,13 @@
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 </div>
-<h3><span class="caption"><i class="fa fa-comments"></i> {{echoarea[0]}}: {{echoarea[1]}}</span></h3>
+<h3><span class="caption"><i class="fa fa-comments"></i> {{echoarea[2]}}: {{echoarea[1]}}</span></h3>
 <div id="rbuttons">
 <form id="search" class="query" method="get" action="/search/{{echoarea[0]}}"><input class="input_line" name="regexp" placeholder="regexp" value="" type="text"/></form>
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>
+%if not api.is_vea(echoarea[0]):
 <a href="/new/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> Новое</span></a>
+%end
 </div>
 </div>
 <br>
@@ -34,11 +36,11 @@
 %end
 <div id="echo-buttons">
 %if points.is_operator(auth):
-<a href="/favorites/{{msgid}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>
-<a href="/edit/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
+<a href="/favorites/{{msg[0]}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>
+<a href="/edit/{{msg[1][1]}}/{{msg[0]}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
 %end
 <a href="/{{msg[0]}}" class="echo-button" title="Ссылка на сообщение"><i class="fa fa-eye"></i></a>
-<a href="/reply/{{echoarea[0]}}/{{msg[0]}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
+<a href="/reply/{{msg[1][1]}}/{{msg[0]}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
 </div>
 %if points.is_operator(auth):
 <a class="blacklisted" href="/s/blacklisted/{{msg[0]}}" title="Поместить сообщение в ЧС"><i class="fa fa-trash"></i></a>
@@ -70,7 +72,7 @@
 {{!api.body_render("\n".join(body))}}
 %else:
 {{!api.body_render("\n".join(body[0:16]))}}
-<br><br><a href="/{{msgid}}">Читать далее</a>
+<br><br><a href="/{{msg[0]}}">Читать далее</a>
 %end
 
 </div><br>
