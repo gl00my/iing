@@ -2,8 +2,11 @@ import api, points, base64, math, urllib
 from api.bottle import *
 
 def get_page(n):
+    return math.floor(n / 50) + 1
+
+def get_pages(n):
     if n == 0:
-        return 1
+        return 1;
     return math.ceil(n / 50)
 
 def get_last_cookie(e):
@@ -55,7 +58,7 @@ def echoes(subscription):
         if last:
             temp.append(get_page(api.get_echoarea(echoarea[0]).index(last)))
         else:
-            temp.append(get_page(len(api.get_echoarea(echoarea[0]))))
+            temp.append(get_pages(len(api.get_echoarea(echoarea[0]))))
 
         vea = api.is_vea(echoarea[0])
         if vea:
@@ -117,8 +120,10 @@ def index():
     subscription = subscriptions()
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
     for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True): #[0:5]:
+        if api.is_vea(echoarea[0]):
+            continue
         last = api.get_last_msgid(echoarea[0])
-        page = get_page(len(api.get_echoarea(echoarea[0])))
+        page = get_pages(len(api.get_echoarea(echoarea[0])))
         echoareas.append({"echoname": echoarea[0], "count": api.get_echoarea_count(echoarea[0]), "dsc": echoarea[1], "msg": api.get_last_msg(echoarea[0]), "last": last, "page": page})
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
@@ -162,7 +167,7 @@ def ffeed(echoarea, msgid, page):
     last = msgid
     if not page:
         if not last:
-            page = get_page(len(msglist))
+            page = get_pages(len(msglist))
             if page == 0:
                 page = 1
         else:
@@ -266,7 +271,7 @@ def showmsg(msgid):
                 try:
                     page = get_page(api.get_echoarea(echoarea[0]).index(msgid))
                 except:
-                    page = get_page(api.get_echoarea_count(echoarea[0]))
+                    page = get_pages(api.get_echoarea_count(echoarea[0]))
             else:
                 page = False
             return template("tpl/message.tpl", nodename=api.nodename, echoarea=echoarea, index=index, msgid=msgid, repto=repto, current=current, time=t, point=point, address=address, to=to, subj=subj, body=body, msgfrom=msgfrom, background=api.background, auth=auth, feed=feed, page=page)
@@ -294,7 +299,7 @@ def msg_list(echoarea, page=False, msgid=False):
     ea = [ea for ea in api.echoareas if ea[0] == echoarea][0]
     if not page:
         if not msgid:
-            page = get_page(len(msglist))
+            page = get_pages(len(msglist))
         else:
             page = get_page(msglist.index(msgid))
         if page == 0:
