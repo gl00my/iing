@@ -2,6 +2,8 @@ import api, points, base64, math
 from api.bottle import *
 
 def get_page(n):
+    if n == 0:
+        return 1
     return math.ceil(n / 50)
 
 def echoes(subscription):
