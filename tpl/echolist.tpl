@@ -20,6 +20,7 @@
 <div id="echolist">
 <div id="conferences">
 <center><b>Список конференций</b></center>
+%unread = False
 %for echoarea in allechoareas:
 %if echoarea[2] == 0:
 %if feed == 1 and echoarea[3]:
@@ -32,14 +33,17 @@
 %else:
 %if feed == 1 and echoarea[3]:
 <a href="/{{echoarea[0]}}/{{echoarea[4]}}/{{echoarea[3]}}#{{echoarea[3]}}" class="new-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i> {{echoarea[5]}}<span class="unread">{{echoarea[2]}}</span></a>
+%unread = True
 %else:
 <a href="/{{echoarea[0]}}" class="new-button-link" title="{{echoarea[1]}}"><i class="fa fa-comments"></i> {{echoarea[5]}}<span class="unread">{{echoarea[2]}}</span></a>
 %end
 %end
 %end
+%if unread:
 <hr>
 <a href="/readall" class="new-button-link echo-button-link" title="Прочитано">
 <i class="fa fa-check-square"></i> Очистить</a>
+%end
 </div>
 </div>
 
