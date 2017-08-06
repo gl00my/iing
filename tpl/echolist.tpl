@@ -37,6 +37,7 @@
 %end
 %end
 %end
+<hr>
 <a href="/readall" class="new-button-link echo-button-link" title="Прочитано">
 <i class="fa fa-check-square"></i> Очистить</a>
 </div>
