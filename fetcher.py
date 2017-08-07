@@ -168,14 +168,14 @@ def debundle(bundle):
     for msg in bundle:
         if msg:
             m = msg.split(":")
-            if len(m) <= 7:
-                continue;
             msgid = m[0]
-            echoarea = m[2]
-            ealist = get_echoarea(echoarea)
-            if len(msgid) == 20 and m[1] and not (msgid in ealist):
+            if len(msgid) == 20 and m[1]:
                 msg = base64.b64decode(m[1].encode("ascii")).decode("utf8").split("\n")
-                c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (msgid, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
+                if len(msg) >= 2:
+                    echoarea = msg[2]
+                    ealist = get_echoarea(echoarea)
+                    if not (msgid in ealist):
+                        c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (msgid, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
     con.commit()
 
 def echo_filter(ea):
