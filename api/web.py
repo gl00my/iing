@@ -1,4 +1,4 @@
-import api, points, base64, math, urllib
+import api, points, base64, math, urllib, time
 from api.bottle import *
 
 def get_page(n):
@@ -106,11 +106,9 @@ def subscriptions():
                 subscription.append(e)
 
     auth = request.get_cookie("authstr")
-    username, addr = points.check_point(auth)
-
-    if username:
-        subscription.append(["mail.to@"+username, "CC"])
-        subscription.append(["mail.from@"+username, "Отправленные"])
+    if auth:
+        subscription.append(["mail.to@"+auth, "CC"])
+        subscription.append(["mail.from@"+auth, "Отправленные"])
 
     return subscription
 
@@ -189,7 +187,10 @@ def ffeed(echoarea, msgid, page):
         ea[1] = vea[3]
         ea.append(vea[2])
     else:
-        ea.append(ea[0])
+        if ea[0].startswith("private."):
+            ea.append("Личная переписка")
+        else:
+            ea.append(ea[0])
 
     auth = request.get_cookie("authstr")
     if len(msglist) <= end:
@@ -296,7 +297,11 @@ def msg_list(echoarea, page=False, msgid=False):
             result.append({"msgid": mid, "subject": subject, "from": f, "to": t})
         except:
             None
-    ea = [ea for ea in api.echoareas if ea[0] == echoarea][0]
+    ea = [ea for ea in api.echoareas if ea[0] == echoarea] #[0]
+    if ea:
+        ea = ea[0]
+    else:
+        ea = [ echoarea, "" ]
     if not page:
         if not msgid:
             page = get_pages(len(msglist))
@@ -318,7 +323,16 @@ def reply(e1, e2, msgid = False):
         msg = api.get_msg(msgid).split("\n")
     else:
         msg = False
-    return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background)
+    return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background, addr = False)
+
+@route("/private")
+@route("/private/<addr>")
+def private(addr = False):
+    auth = request.get_cookie("authstr")
+    if not auth:
+        return redirect("/")
+    echoarea = "private." + api.hsh(auth + str(time.time())).lower()
+    return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=False, msg=False, addr = addr, auth=auth, hidehome=False, topiclist=False, background=api.background)
 
 @post("/a/savemsg/<echoarea>")
 @post("/a/savemsg/<echoarea>/<msgid>")
@@ -343,8 +357,7 @@ def save_messsage(echoarea, msgid = False):
             message=api.toss_msg(msgfrom, addr, msg)
             if message.startswith("msg ok"):
                 redirect("/%s" % message[7:])
-        else:
-            redirect("/")
+    redirect("/")
 
 @post("/s/subscription")
 @route("/s/subscription")
@@ -449,6 +462,10 @@ def registration():
     if api.registration:
         username = request.forms.get("username")
         password = request.forms.get("password")
+
+        if username and not points.username_filter(username):
+            return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm="Плохое имя пользователя.")
+
         if username and password:
             if points.check_username(username):
                 return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm="Имя пользователя уже существует.")

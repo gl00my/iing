@@ -1,4 +1,4 @@
-import os, re, time, math, codecs, base64, hashlib, sqlite3
+import os, re, time, math, codecs, base64, hashlib, sqlite3, points
 from textwrap import wrap
 
 con = sqlite3.connect("idec.db")
@@ -157,7 +157,10 @@ def get_echoarea_count(echoarea):
         return vea_call(vea, 'get_echoarea_count')
 
     r = 0
-    q = c.execute("SELECT msgid FROM msg WHERE echoarea = ?;", (echoarea,))
+    try:
+        q = c.execute("SELECT msgid FROM msg WHERE echoarea = ?;", (echoarea,))
+    except:
+        return 0
     for row in q:
         r += 1
     return r
@@ -257,6 +260,22 @@ def spoiler_msg(msg):
     rmsg.append(spoiler_body("\n".join(lines[8:])))
     return "\n".join(rmsg)
 
+def toss_private(t):
+    s = t.find("<")
+    if s < 0:
+        return to
+    e = t.find('>')
+    if e < 0 or e < s:
+        return to
+    addr = t[s + 1:e]
+    addr = addr.split(",", 1)
+    if len(addr) != 2 or addr[0].strip() != nodename:
+        return t
+    ud = points.lookup_addr(addr[1].strip())
+    if not ud:
+            return False
+    return ud[2]
+
 def toss_msg(msgfrom, addr, tmsg):
     try:
         rawmsg = base64.b64decode(tmsg).decode("utf-8").split("\n")
@@ -272,6 +291,10 @@ def toss_msg(msgfrom, addr, tmsg):
         msg.append(str(round(time.time())))
         msg.append(msgfrom)
         msg.append(nodename + "," + str(addr))
+        t = toss_private(rawmsg[1])
+        if not t:
+            return "error:wrong point"
+        rawmsg[1] = t
         msg.append(rawmsg[1])
         msg.append(rawmsg[2])
         msg.append("")
@@ -427,62 +450,6 @@ def edit_msg(msgid, subj, msgbody):
     con.commit()
     return "msg ok:" + msgid
 
-def mail_last_msgid(arg):
-    to = arg
-    if not to:
-        return False
-    try:
-        return c.execute("SELECT msgid FROM msg WHERE t = ? ORDER BY id DESC LIMIT 1;", (to,)).fetchone()[0]
-    except:
-        return False
-
-def mail_echo_msgids(arg):
-    msgids = []
-    to = arg
-    if not to:
-        return msgids
-    for row in c.execute("SELECT msgid FROM msg WHERE t = ? ORDER BY id;", (to,)):
-        msgids.append(row[0])
-    return msgids
-
-def mail_echoarea_count(arg):
-    r = 0
-    to = arg
-    if not to:
-        return 0;
-    q = c.execute("SELECT msgid FROM msg WHERE t = ?;", (to,))
-    for row in q:
-        r += 1
-    return r
-
-def from_last_msgid(arg):
-    fr = arg
-    if not fr:
-        return False
-    try:
-        return c.execute("SELECT msgid FROM msg WHERE fr = ? ORDER BY id DESC LIMIT 1;", (fr,)).fetchone()[0]
-    except:
-        return False
-
-def from_echo_msgids(arg):
-    msgids = []
-    fr = arg
-    if not fr:
-        return msgids
-    for row in c.execute("SELECT msgid FROM msg WHERE fr = ? ORDER BY id;", (fr,)):
-        msgids.append(row[0])
-    return msgids
-
-def from_echoarea_count(arg):
-    r = 0
-    fr = arg
-    if not fr:
-        return 0;
-    q = c.execute("SELECT msgid FROM msg WHERE fr = ?;", (fr,))
-    for row in q:
-        r += 1
-    return r
-
 def query_echo_msgids(arg, cache = False):
     if cache and arg in virtual_ea['.query']['cache']:
         return virtual_ea['.query']['cache'][arg]
@@ -523,19 +490,100 @@ def query_decode(arg):
         echoarea = vea[3]
     return echoarea + "//" + regexp
 
+def mail_last_msgid(auth):
+    username, addr = points.check_point(auth)
+    if not username:
+            return False
+    addr = "%<" + nodename + "," + str(addr) + ">%"
+    try:
+        return c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? ) ORDER BY id DESC LIMIT 1;", (username, addr)).fetchone()[0]
+    except:
+        return False
+
+def mail_echo_msgids(auth):
+    msgids = []
+    username, addr = points.check_point(auth)
+    if not username:
+            return msgids
+    addr = "%<" + nodename + "," + str(addr) + ">%"
+    for row in c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? ) ORDER BY id;", (username, addr)):
+        msgids.append(row[0])
+    return msgids
+
+def mail_echoarea_count(auth):
+    r = 0
+    username, addr = points.check_point(auth)
+    if not username:
+            return r
+    addr = "%<" + nodename + "," + str(addr) + ">%"
+    try:
+        q = c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? );", (username, addr))
+    except:
+        return 0
+    for row in q:
+        r += 1
+    return r
+
+def from_last_msgid(auth):
+    username, addr = points.check_point(auth)
+    if not username:
+            return False
+    addr = nodename + "," + str(addr)
+    try:
+        return c.execute("SELECT msgid FROM msg WHERE ( addr = ? ) ORDER BY id DESC LIMIT 1;", (addr, )).fetchone()[0]
+    except:
+        return False
+
+def from_echo_msgids(auth):
+    msgids = []
+    username, addr = points.check_point(auth)
+    if not username:
+            return msgids
+    addr = nodename + "," + str(addr)
+    for row in c.execute("SELECT msgid FROM msg WHERE ( addr = ? ) ORDER BY id;", (addr,)):
+        msgids.append(row[0])
+    return msgids
+
+def from_echoarea_count(auth):
+    r = 0
+    username, addr = points.check_point(auth)
+    if not username:
+            return r
+    addr = nodename + "," + str(addr)
+    q = c.execute("SELECT msgid FROM msg WHERE ( addr = ? );", (addr, ))
+    for row in q:
+        r += 1
+    return r
+
+def mail_decode(auth):
+    username, addr = points.check_point(auth)
+    if not username:
+        return arg
+    return username
+
+def netmail_last_msgid(auth):
+    try:
+        return c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
+    except:
+        return False
+
+def netmail_echo_msgids(auth):
+    msgids = []
+    for row in c.execute("SELECT msgid, t FROM msg WHERE t like '%<%>%' ORDER BY id;"):
+        msgids.append(row[0])
+    return msgids
+
+def netmail_echoarea_count(auth):
+    r = 0
+    try:
+        q = c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
+    except:
+        return 0
+    for row in q:
+        r += 1
+    return r
+
 virtual_ea = {
-    'mail.to' : {
-        'name': 'Для',
-        'get_last_msgid': mail_last_msgid,
-        'get_echo_msgids': mail_echo_msgids,
-        'get_echoarea_count': mail_echoarea_count,
-    },
-    'mail.from' : {
-        'name': 'От',
-        'get_last_msgid': from_last_msgid,
-        'get_echo_msgids': from_echo_msgids,
-        'get_echoarea_count': from_echoarea_count,
-    },
     '.query' : {
         'name': 'Поиск',
         'cache' : { },
@@ -544,4 +592,24 @@ virtual_ea = {
         'get_echo_msgids': query_echo_msgids,
         'get_echoarea_count': query_echoarea_count,
     },
+    'mail.to' : {
+        'name': 'Для',
+        'decode': mail_decode,
+        'get_last_msgid': mail_last_msgid,
+        'get_echo_msgids': mail_echo_msgids,
+        'get_echoarea_count': mail_echoarea_count,
+    },
+    'mail.from' : {
+        'name': 'От',
+        'decode': mail_decode,
+        'get_last_msgid': from_last_msgid,
+        'get_echo_msgids': from_echo_msgids,
+        'get_echoarea_count': from_echoarea_count,
+    },
+#    'net.mail' : {
+#        'name': 'netmail',
+#        'get_last_msgid': netmail_last_msgid,
+#        'get_echo_msgids': netmail_echo_msgids,
+#        'get_echoarea_count': netmail_echoarea_count,
+#    },
 }

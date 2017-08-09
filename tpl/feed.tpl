@@ -39,6 +39,10 @@
 <a href="/favorites/{{msg[0]}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>
 <a href="/edit/{{msg[1][1]}}/{{msg[0]}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
 %end
+%node=msg[1][4].split(",")
+%if len(node) == 2 and node[0] == nodename:
+<a href="/private/{{msg[1][3]}} <{{msg[1][4]}}>" class="echo-button" title="Личное сообщение"><i class="fa fa-envelope"></i></a>
+%end
 <a href="/{{msg[0]}}" class="echo-button" title="Ссылка на сообщение"><i class="fa fa-eye"></i></a>
 <a href="/reply/{{msg[1][1]}}/{{msg[0]}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
 </div>
@@ -60,6 +64,9 @@
 %body = msg[1][8:]
 
 <div class="message-header">
+%if msg[1][1].startswith("private.") and msg[1][1] != echoarea[0]:
+<span style="background-color:gold"><a href="/{{msg[1][1]}}"><b>Личная переписка</b></a></span><br>
+%end
 %if repto:
 <b>Ответ на:</b> <a href="/{{repto}}">{{repto}}</a><br>
 %end

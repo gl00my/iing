@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
-import hashlib, random, base64
+import hashlib, random, base64, re
+
+def username_filter(name):
+    rr = re.compile(r'[^<>%]{1,16}$')
+    if rr.match(name): return True
 
 def check_point(auth):
     try:
@@ -12,6 +16,15 @@ def check_point(auth):
         return "", None
     except:
         return "", None
+
+def lookup_addr(addr):
+    points = open("points.txt", "r").read().split("\n")
+    for n in points:
+        if len(n) > 0:
+            ud = n.split(":")
+            if addr == ud[3]:
+                return ud
+    return False
 
 def check_username(username):
     points = open("points.txt", "r").read().split("\n")

@@ -91,6 +91,10 @@
 <a class="echo-button-disabled"><i class="fa fa-fast-backward"></i></a>
 <a class="echo-button-disabled"><i class="fa fa-step-backward"></i></a>
 %end
+%node=address.split(",")
+%if len(node) == 2 and node[0] == nodename:
+<a href="/private/{{point}} <{{address}}>" class="echo-button" title="Личное сообщение"><i class="fa fa-envelope"></i></a>
+%end
 <a href="/reply/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
 %if points.is_operator(auth):
 <a href="/favorites/{{msgid}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>

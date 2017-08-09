@@ -12,7 +12,7 @@
 %else:
 %title="Новое сообщение в " + echoarea
 %repto = ""
-%to = "All"
+%to = addr or "All"
 %subj = False
 %end
 <div id="panel">
