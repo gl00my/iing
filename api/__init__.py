@@ -263,10 +263,10 @@ def spoiler_msg(msg):
 def toss_private(t):
     s = t.find("<")
     if s < 0:
-        return to
+        return t
     e = t.find('>')
     if e < 0 or e < s:
-        return to
+        return t
     addr = t[s + 1:e]
     addr = addr.split(",", 1)
     if len(addr) != 2 or addr[0].strip() != nodename:
