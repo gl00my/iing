@@ -354,6 +354,8 @@ def body_render(body):
             txt += line.replace("<br>", "") + "\n"
         else:
             txt += line + "\n"
+    if pre == 1:
+        txt += "</pre>\n"
     return txt
 
 def get_file_size(filename):
