@@ -6,6 +6,12 @@ def username_filter(name):
     rr = re.compile(r'[^<>%]{1,16}$')
     if rr.match(name): return True
 
+def is_point(auth):
+    a, b = check_point(auth)
+    if a == "":
+        return False
+    return True
+
 def check_point(auth):
     try:
         points = open("points.txt", "r").read().split("\n")

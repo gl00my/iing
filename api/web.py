@@ -1,4 +1,4 @@
-import api, points, base64, math, urllib, time
+import api, points, base64, math, urllib, time, json
 from api.bottle import *
 
 def get_page(n):
@@ -9,22 +9,72 @@ def get_pages(n):
         return 1;
     return math.ceil(n / 50)
 
+def set_user_conf(name, value):
+    auth = request.get_cookie("authstr")
+
+    if not points.is_point(auth):
+        return response.set_cookie(name, value, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    try:
+        cfg = json.loads(open("profiles/" + auth, "r").read())
+    except:
+        cfg = {}
+    if not (type(cfg) is dict):
+        cfg = {}
+    cfg[name] = value
+    open("profiles/" + auth, "w").write(json.dumps(cfg))
+
+def get_user_conf(name):
+    auth = request.get_cookie("authstr")
+    if not points.is_point(auth):
+        return request.get_cookie(name, secret='some-secret-key')
+    try:
+        cfg = json.loads(open("profiles/" + auth, "r").read())
+    except:
+        cfg = {}
+    if name in cfg:
+        return cfg[name]
+    return False
+
 def get_last_cookie(e):
     if e.startswith('.'):
         return False
-    last = request.get_cookie("last", secret='some-secret-key')
+    auth = request.get_cookie("authstr")
+    if not points.is_point(auth):
+        last = request.get_cookie("last", secret='some-secret-key')
+        if not last or not (e in last):
+            return False
+        return last[e]
+    last = get_user_conf('last') or {}
     if not last or not (e in last):
         return False
     return last[e]
 
 def set_last_cookie(e, msg):
     if e.startswith('.'):
-        return
-    last = request.get_cookie("last", secret='some-secret-key')
-    if not (type(last) is dict):
-        last = {}
+        return True
+    auth = request.get_cookie("authstr")
+    if not points.is_point(auth):
+        last = request.get_cookie("last", secret='some-secret-key')
+        if not (type(last) is dict):
+            last = {}
+        last[e] = msg
+        return response.set_cookie("last", last, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    last = get_user_conf('last') or {}
     last[e] = msg
-    response.set_cookie("last", last, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    set_user_conf('last', last)
+    return last[e]
+
+def get_subscription():
+    return get_user_conf("subscription") or []
+
+def set_subscription(subscription):
+    return set_user_conf("subscription", subscription)
+
+def get_feed():
+    return get_user_conf("feed") or 1
+
+def set_feed(feed):
+    return set_user_conf("feed", feed)
 
 def echoes(subscription):
     allechoareas = []
@@ -77,7 +127,7 @@ def subscriptions():
         if len(subscription) == 0:
             return api.echoareas
     else:
-        subscription = request.get_cookie("subscription", secret='some-secret-key')
+        subscription = get_subscription()
 
     flag = False
 
@@ -96,7 +146,7 @@ def subscriptions():
                 flag = True
                 subscription.append(ea)
     if flag:
-        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
+        set_subscription(subscription)
 
     s = subscription
     subscription = []
@@ -126,7 +176,7 @@ def index():
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
     msgfrom, addr = points.check_point(auth)
-    feed = request.get_cookie("feed", secret='some-secret-key')
+    feed = get_feed()
     if not feed:
         feed = 1
     else:
@@ -140,8 +190,7 @@ def readall():
     last = {}
     for ea in subscription:
         last[ea[0]] = api.get_last_msgid(ea[0])
-
-    response.set_cookie("last", last, path="/", max_age=180*24*60*60, secret='some-secret-key')
+    set_user_conf("last", last)
     return redirect("/")
 
 @route("/echolist")
@@ -151,7 +200,7 @@ def echolist():
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
     msgfrom, addr = points.check_point(auth)
-    feed = request.get_cookie("feed", secret='some-secret-key')
+    feed = get_feed()
     if not feed:
         feed = 1
     else:
@@ -208,7 +257,7 @@ def echoareas(e1, e2, msgid=False, page=False):
     echoarea=e1 + "." + e2
     if not get_last_cookie(echoarea):
         set_last_cookie(echoarea, api.get_last_msgid(echoarea));
-    feed = request.get_cookie("feed", secret='some-secret-key')
+    feed = get_feed()
     if not feed or api.is_vea(echoarea):
         feed = 1
     else:
@@ -263,7 +312,7 @@ def showmsg(msgid):
             current = index.index(msgid)
             set_last_cookie(echoarea[0], msgid)
             auth = request.get_cookie("authstr")
-            feed = request.get_cookie("feed", secret='some-secret-key')
+            feed = get_feed()
             if not feed:
                 feed = 1
             else:
@@ -368,15 +417,15 @@ def subscription():
     if request.forms.get("default"):
         for ea in api.echoareas:
             subscription.append(ea[0])
-        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
+        set_subscription(subscription)
         redirect("/")
     if s:
         for ea in s.strip().replace("\r", "").split("\n"):
             if api.echo_filter(ea):
                 subscription.append(ea)
-        response.set_cookie("subscription", subscription, path="/", max_age=180*24*60*60, secret='some-secret-key')
+        set_subscription(subscription)
         redirect("/")
-    subscription = request.get_cookie("subscription", secret='some-secret-key')
+    subscription = get_subscription()
     echoareas = []
     for echoarea in api.echoareas:
         echoareas.append([echoarea[0], api.get_echoarea_count(echoarea[0]), echoarea[1]])
@@ -423,7 +472,7 @@ def blacklist(msgid):
 
 @route("/s/feed/<feed>")
 def sfeed(feed):
-    response.set_cookie("feed", feed, path="/", max_age=3600000000, secret='some-secret-key')
+    set_feed(feed)
     redirect("/profile")
 
 @route("/login")
@@ -444,7 +493,7 @@ def login():
 def profile():
     auth = request.get_cookie("authstr")
     username, addr = points.check_point(auth)
-    feed = request.get_cookie("feed", secret='some-secret-key')
+    feed = get_feed()
     if not feed:
         feed = 1
     else:

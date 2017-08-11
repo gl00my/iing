@@ -35,6 +35,10 @@ def init():
         os.makedirs("fecho")
     if not os.path.exists("files"):
         os.makedirs("files")
+    if not os.path.exists("profiles"):
+        os.makedirs("profiles")
+    if not os.path.exists("favorites"):
+        os.makedirs("favorites")
     if not os.path.exists("files/indexes"):
         os.makedirs("files/indexes")
     if not os.path.exists("blacklist.txt"):
@@ -329,7 +333,7 @@ def body_render(body):
     body = rr.sub(r"<span class='quote'>\1</span>", body)
     rr = re.compile("((^|\n)(PS|P.S|ps|ЗЫ|З.Ы|\/\/|#).*)")
     body = rr.sub(r"\n<span class='comment'>\1</span>", body)
-    rr = re.compile("((http|https|ftp):\/\/[a-z_0-9\-.:]+(\/[^ \t<>\n\r]+)?\/?)")
+    rr = re.compile("((http|https|ftp):\/\/[a-z_0-9\-.]+(:[0-9]+)?(\/[^ \t<>()\n\r]+)?\/?)")
     body = rr.sub(r"<span class='url'><a target='_blank' href='\1'><i class='fa fa-link'></i> \1</a></span>", body)
     rr = re.compile("(ii:\/\/)([a-z0-9_!.-]{1,60}\.[a-z0-9_!.-]{1,59}[a-z0-9_!-])")
     body = rr.sub(r"<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='\2'>\2</a>", body)
@@ -494,7 +498,7 @@ def query_decode(arg):
 
 def mail_last_msgid(auth):
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return False
     addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
@@ -505,7 +509,7 @@ def mail_last_msgid(auth):
 def mail_echo_msgids(auth):
     msgids = []
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return msgids
     addr = "%<" + nodename + "," + str(addr) + ">%"
     for row in c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? ) ORDER BY id;", (username, addr)):
@@ -515,7 +519,7 @@ def mail_echo_msgids(auth):
 def mail_echoarea_count(auth):
     r = 0
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return r
     addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
@@ -528,7 +532,7 @@ def mail_echoarea_count(auth):
 
 def from_last_msgid(auth):
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return False
     addr = nodename + "," + str(addr)
     try:
@@ -539,7 +543,7 @@ def from_last_msgid(auth):
 def from_echo_msgids(auth):
     msgids = []
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return msgids
     addr = nodename + "," + str(addr)
     for row in c.execute("SELECT msgid FROM msg WHERE ( addr = ? ) ORDER BY id;", (addr,)):
@@ -549,7 +553,7 @@ def from_echo_msgids(auth):
 def from_echoarea_count(auth):
     r = 0
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
             return r
     addr = nodename + "," + str(addr)
     q = c.execute("SELECT msgid FROM msg WHERE ( addr = ? );", (addr, ))
@@ -559,7 +563,7 @@ def from_echoarea_count(auth):
 
 def mail_decode(auth):
     username, addr = points.check_point(auth)
-    if not username:
+    if username == "":
         return arg
     return username
 
