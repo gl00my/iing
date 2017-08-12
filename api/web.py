@@ -438,7 +438,7 @@ def subscription():
             subscription.append(ea[0])
         set_subscription(subscription)
         redirect("/")
-    if s:
+    if request.POST:
         for ea in s.strip().replace("\r", "").split("\n"):
             if api.echo_filter(ea):
                 subscription.append(ea)
