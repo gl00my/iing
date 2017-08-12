@@ -1,4 +1,4 @@
-import api, points, base64, math, urllib, time, json
+import api, points, base64, math, urllib, time, json, i18n
 from api.bottle import *
 
 def get_page(n):
@@ -23,9 +23,11 @@ def set_user_conf(name, value):
     cfg[name] = value
     open("profiles/" + auth, "w").write(json.dumps(cfg))
 
-def get_user_conf(name):
+def get_user_conf(name, cookie = True):
     auth = request.get_cookie("authstr")
     if not points.is_point(auth):
+        if not cookie:
+            return False
         return request.get_cookie(name, secret='some-secret-key')
     try:
         cfg = json.loads(open("profiles/" + auth, "r").read())
@@ -76,6 +78,19 @@ def get_feed():
 def set_feed(feed):
     return set_user_conf("feed", feed)
 
+def get_lang():
+    lang = get_user_conf("lang")
+    if not lang:
+        l = request.headers.get('Accept-Language')
+        if l and l.startswith("ru"):
+            lang = 'ru'
+        else:
+            lang = 'en'
+    return lang
+
+def set_lang(lang):
+    return set_user_conf("lang", lang)
+
 def echoes(subscription):
     allechoareas = []
 
@@ -112,7 +127,7 @@ def echoes(subscription):
 
         vea = api.is_vea(echoarea[0])
         if vea:
-            temp.append(vea[2] + ": " + vea[3])
+            temp.append(i18n.tr(vea[2]) + ": " + vea[3])
         else:
             temp.append(echoarea[0])
 
@@ -157,8 +172,8 @@ def subscriptions():
 
     auth = request.get_cookie("authstr")
     if auth:
-        subscription.append(["mail.to@"+auth, "CC"])
-        subscription.append(["mail.from@"+auth, "Отправленные"])
+        subscription.append(["mail.to@"+auth, i18n.tr("Received")])
+        subscription.append(["mail.from@"+auth, i18n.tr("Sent")])
 
     return subscription
 
@@ -237,7 +252,8 @@ def ffeed(echoarea, msgid, page):
         ea.append(vea[2])
     else:
         if ea[0].startswith("private."):
-            ea.append("Личная переписка")
+            ea.append(i18n.tr("Private correspondence"))
+            ea[1] = ea[0][8:]
         else:
             ea.append(ea[0])
 
@@ -298,6 +314,8 @@ def showmsg(msgid):
                 echoarea = [ea for ea in api.echoareas if ea[0] == body[1]]
                 if len(echoarea) == 0:
                     echoarea = [body[1], ""]
+                    if body[1].startswith("private."):
+                        echoarea[1] = i18n.tr("Private correspondence")
                 else:
                     echoarea = echoarea[0]
             else:
@@ -364,6 +382,7 @@ def msg_list(echoarea, page=False, msgid=False):
 @route("/reply/<e1>.<e2>")
 @route("/reply/<e1>.<e2>/<msgid>")
 def reply(e1, e2, msgid = False):
+#    msgbody = request.forms.get("msgbody")
     echoarea = e1 + "." + e2
     if api.is_vea(echoarea):
         return redirect("/")
@@ -406,6 +425,7 @@ def save_messsage(echoarea, msgid = False):
             message=api.toss_msg(msgfrom, addr, msg)
             if message.startswith("msg ok"):
                 redirect("/%s" % message[7:])
+            return message
     redirect("/")
 
 @post("/s/subscription")
@@ -470,6 +490,11 @@ def blacklist(msgid):
             open("blacklist.txt", "a").write(msgid + "\n")
     redirect("/")
 
+@route("/s/language/<lang>")
+def slang(lang):
+    set_lang(lang)
+    redirect("/profile")
+
 @route("/s/feed/<feed>")
 def sfeed(feed):
     set_feed(feed)
@@ -486,7 +511,7 @@ def login():
             response.set_cookie("authstr", auth, path="/", max_age=3600000000)
             redirect("/")
         else:
-            return template("tpl/login.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, username=username, auth=auth, registration=api.registration, alarm="Неверные учётные данные!")
+            return template("tpl/login.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, username=username, auth=auth, registration=api.registration, alarm=i18n.tr("Wrong username or password!"))
     return template("tpl/login.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, registration=api.registration, username=False, auth=False, alarm=False)
 
 @route("/profile")
@@ -494,11 +519,12 @@ def profile():
     auth = request.get_cookie("authstr")
     username, addr = points.check_point(auth)
     feed = get_feed()
+    lang = get_lang() or 'en'
     if not feed:
         feed = 1
     else:
         feed = int(feed)
-    return template("tpl/profile.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, username=username, auth=auth, addr=addr, feed=feed)
+    return template("tpl/profile.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, username=username, auth=auth, addr=addr, feed=feed, lang = lang)
 
 @route("/logout")
 def logout():
@@ -513,11 +539,11 @@ def registration():
         password = request.forms.get("password")
 
         if username and not points.username_filter(username):
-            return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm="Плохое имя пользователя.")
+            return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm=i18n.tr("Bad username!"))
 
         if username and password:
             if points.check_username(username):
-                return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm="Имя пользователя уже существует.")
+                return template("tpl/registration.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, alarm=i18n.tr("Such username already exists!"))
             else:
                 hsh, phash = points.make_point(username, password)
                 points.save_point(phash, username, hsh)
@@ -634,3 +660,7 @@ def search(e1, e2):
     regexp = request.query.regexp
     regexp = base64.urlsafe_b64encode(regexp.encode("utf-8")) #.decode("utf-8")
     return redirect("/.query@"+ urllib.parse.quote(echoarea) + "@" + urllib.parse.quote(regexp))
+
+@hook('before_request')
+def language():
+    i18n.setlang(get_lang())

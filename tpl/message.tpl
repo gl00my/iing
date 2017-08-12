@@ -1,9 +1,9 @@
-%import api, re, points
+%import api, re, points, i18n
 %include tpl/header.tpl nodename=nodename, background=background
 
 <div id="panel">
 <div id="buttons">
-<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
+<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 </div>
 %if feed == 1:
@@ -16,8 +16,8 @@
 %if feed == 0:
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>
 %end
-<a href="/new/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> Новое</span></a>
-<a href="/msglist/{{echoarea[0]}}/{{msgid}}" class="button"><i class="fa fa-list"></i><span class="caption"> Список</span></a>
+<a href="/new/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> {{i18n.tr("New")}}</span></a>
+<a href="/msglist/{{echoarea[0]}}/{{msgid}}" class="button"><i class="fa fa-list"></i><span class="caption"> {{i18n.tr('List')}}</span></a>
 </div>
 </div>
 
@@ -81,28 +81,28 @@
 <td>
 <div class="single-message">
 %if points.is_operator(auth):
-<a class="blacklisted" href="/s/blacklisted/{{msgid}}" title="Поместить сообщение в ЧС"><i class="fa fa-trash"></i></a>
+<a class="blacklisted" href="/s/blacklisted/{{msgid}}" title="{{i18n.tr('Blacklist')}}"><i class="fa fa-trash"></i></a>
 %end
 <div id="echo-buttons">
 %if current > 0:
-<a href="/{{index[0]}}" class="echo-button" title="В начало"><i class="fa fa-fast-backward"></i></a>
-<a href="/{{prev}}" class="echo-button" title="Предыдущее сообщение"><i class="fa fa-step-backward"></i></a>
+<a href="/{{index[0]}}" class="echo-button" title="{{i18n.tr('Begin')}}"><i class="fa fa-fast-backward"></i></a>
+<a href="/{{prev}}" class="echo-button" title="{{i18n.tr("Prev")}}"><i class="fa fa-step-backward"></i></a>
 %else:
 <a class="echo-button-disabled"><i class="fa fa-fast-backward"></i></a>
 <a class="echo-button-disabled"><i class="fa fa-step-backward"></i></a>
 %end
 %node=address.split(",")
 %if len(node) == 2 and node[0] == nodename:
-<a href="/private/{{point}} <{{address}}>" class="echo-button" title="Личное сообщение"><i class="fa fa-envelope"></i></a>
+<a href="/private/{{point}} <{{address}}>" class="echo-button" title="{{i18n.tr('Private message')}}"><i class="fa fa-envelope"></i></a>
 %end
-<a href="/reply/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Ответить"><i class="fa fa-reply"></i></a>
+<a href="/reply/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="{{i18n.tr('Reply')}}"><i class="fa fa-reply"></i></a>
 %if points.is_operator(auth):
-<a href="/favorites/{{msgid}}" class="echo-button" title="Избранное"><i class="fa fa-heart"></i></a>
-<a href="/edit/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="Редактировать"><i class="fa fa-edit"></i></a>
+<a href="/favorites/{{msgid}}" class="echo-button" title="{{i18n.tr('Favorites')}}"><i class="fa fa-heart"></i></a>
+<a href="/edit/{{echoarea[0]}}/{{msgid}}" class="echo-button" title="{{i18n.tr('Edit')}}"><i class="fa fa-edit"></i></a>
 %end
 %if current < len(index) - 1:
-<a href="/{{next}}" class="echo-button" title="Следующее сообщение"><i class="fa fa-step-forward"></i></a>
-<a href="/{{index[-1]}}" class="echo-button" title="В конец"><i class="fa fa-fast-forward"></i></a>
+<a href="/{{next}}" class="echo-button" title="{{i18n.tr('Next')}}"><i class="fa fa-step-forward"></i></a>
+<a href="/{{index[-1]}}" class="echo-button" title="{{i18n.tr('End')}}"><i class="fa fa-fast-forward"></i></a>
 %else:
 <a class="echo-button-disabled"><i class="fa fa-step-forward"></i></a>
 <a class="echo-button-disabled"><i class="fa fa-fast-forward"></i></a>
@@ -111,11 +111,11 @@
 
 <div class="message-header">
 %if repto:
-<b>Ответ на:</b> <a href="/{{repto}}">{{repto}}</a><br>
+<b>{{i18n.tr("Reply to")}}:</b> <a href="/{{repto}}">{{repto}}</a><br>
 %end
-<b>От:</b> {{point}} ({{address}}) {{time}}<br>
-<b>Кому:</b> {{to}}<br>
-<b>Тема:</b> {{subj}}
+<b>{{i18n.tr("From")}}:</b> {{point}} ({{address}}) {{time}}<br>
+<b>{{i18n.tr("To")}}:</b> {{to}}<br>
+<b>{{i18n.tr("Subject")}}:</b> {{subj}}
 </div>
 {{!api.body_render("\n".join(body))}}
 </div>

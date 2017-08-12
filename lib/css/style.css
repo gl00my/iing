@@ -488,3 +488,14 @@ textarea {
 	display: block;
     }
 }
+
+.help {
+    text-align: left; 
+}
+
+.help-item {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    padding: 16px 32px;
+}

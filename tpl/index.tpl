@@ -1,4 +1,4 @@
-%import api
+%import api, i18n
 %include tpl/header.tpl nodename=nodename, dsc=dsc, background=background
 
 <script>
@@ -29,16 +29,16 @@
 <span id="container"><h3 id="nodedsc"><a href="/"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 <div id="rbuttons">
-<a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> Избранное</span></a>
-<a href="http://instead.syscall.ru/ru/club" class="button"><i class="fa fa-info-circle"></i><span class="caption"> Что это?</span></a>
+<a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> {{i18n.tr("Favorites")}}</span></a>
+<a href="http://instead.syscall.ru/ru/club" class="button"><i class="fa fa-info-circle"></i><span class="caption"> {{i18n.tr("About")}}</span></a>
 %if not nosubscription:
-<a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> Подписки</span></a>
+<a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> {{i18n.tr("Subscriptions")}}</span></a>
 %end
-<a href="/s/filelist" class="button"><i class="fa fa-floppy-o"></i><span class="caption"> Файлы</span></a>
+<a href="/s/filelist" class="button"><i class="fa fa-floppy-o"></i><span class="caption"> {{i18n.tr("Files")}}</span></a>
 %if addr:
-<a href="/profile" class="button"><i class="fa fa-user"></i><span class="caption"> Профиль</span></a>
+<a href="/profile" class="button"><i class="fa fa-user"></i><span class="caption"> {{i18n.tr("Profile")}}</span></a>
 %else:
-<a href="/login" class="button"><i class="fa fa-sign-in"></i><span class="caption"> Войти</span></a>
+<a href="/login" class="button"><i class="fa fa-sign-in"></i><span class="caption"> {{i18n.tr("Log in")}}</span></a>
 %end
 </div>
 </div>
@@ -47,7 +47,7 @@
 <tr>
 <td id="side-menu">
 <div id="conferences">
-<center><b>Список конференций</b></center>
+<center><b>{{i18n.tr("Conferences")}}</b></center>
 %unread = False
 %for echoarea in allechoareas:
 %if echoarea[2] == 0:
@@ -70,8 +70,8 @@
 %end
 %if unread:
 <hr>
-<a href="/readall" class="new-button-link" title="Прочитано">
-<i class="fa fa-check-square"></i> Очистить</a>
+<a href="/readall" class="new-button-link" title="{{i18n.tr("Mark readed")}}">
+<i class="fa fa-check-square"></i> {{i18n.tr("Mark readed")}}</a>
 %end
 </div>
 
@@ -96,7 +96,7 @@
 %if len(body) <= 10:
 %body = api.body_render("\n".join(body))
 %else:
-%body = api.body_render("\n".join(body[0:10])) + "<br><br><a href=" + last_msgid + ">Читать далее</a>"
+%body = api.body_render("\n".join(body[0:10])) + "<br><br><a href=" + last_msgid + ">" + i18n.tr('Read more') + "</a>"
 %end
 {{!body}}
 </div>

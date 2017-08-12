@@ -1,16 +1,16 @@
-%import api, math
+%import api, math, i18n
 %include tpl/header.tpl nodename=nodename, dsc=dsc, echoarea=False, hidehome=False, hidemenu=False, background=background
 
 <div id="panel">
 <div id="buttons">
-<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
+<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 </div>
 <h3><span class="caption">{{echoarea[1]}}</span></h3>
 <div id="rbuttons">
 %if msgid:
-<a href="/favlist/{{echoarea[0]}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
+<a href="/favlist/{{echoarea[0]}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> {{i18n.tr('Back')}}</span></a>
 %else:
-<a href="/favorites" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> Назад</span></a>
+<a href="/favorites" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> {{i18n.tr('Back')}}</span></a>
 %end
 </div>
 </div><br>
@@ -47,8 +47,8 @@
 
 <table cellpaddint="0" cellspacing="0" class="single-message msglist">
 <tr>
-<th>Тема</th>
-<th align="right">От кого &#x279C; Кому</th>
+<th>{{i18n.tr('Subject')}}</th>
+<th align="right">{{i18n.tr('From')}} &#x279C; {{i18n.tr('To')}}</th>
 </tr>
 %for msg in msglist[start:last]:
 %if msg["msgid"] == msgid:

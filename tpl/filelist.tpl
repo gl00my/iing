@@ -1,11 +1,11 @@
-%import os
+%import os, i18n
 %include tpl/header.tpl nodename=nodename, dsc=dsc, background=background
 
 <div id="panel">
 <div id="buttons">
-<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
+<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 </div>
-<h3>Список файлов</h3>
+<h3>{{i18n.tr("Files")}}</h3>
 </div><br>
 
 <div id="conferences" class="width90 files">

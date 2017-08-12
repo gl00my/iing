@@ -1,25 +1,25 @@
-%import api
+%import api, i18n
 %include tpl/header.tpl nodename=nodename, dsc=dsc, background=background
 
 <div id="panel">
-<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> Главная</span></a>
+<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 <div id="rbuttons">
-<a href="http://ii-net.tk/" class="button"><i class="fa fa-info-circle"></i><span class="caption"> О нас</span></a>
+<a href="http://ii-net.tk/" class="button"><i class="fa fa-info-circle"></i><span class="caption"> {{i18n.tr("About")}}</span></a>
 %if not nosubscription:
-<a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> Подписки</span></a>
+<a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> {{i18n.tr("Subscriptions")}}</span></a>
 %end
-<a href="/s/filelist" class="button"><i class="fa fa-floppy-o"></i><span class="caption"> Файлы</span></a>
+<a href="/s/filelist" class="button"><i class="fa fa-floppy-o"></i><span class="caption"> {{i18n.tr("Files")}}</span></a>
 %if addr:
-<a href="/logout" class="button"><i class="fa fa-sign-out"></i><span class="caption"> Выйти</span></a>
+<a href="/logout" class="button"><i class="fa fa-sign-out"></i><span class="caption"> {{i18n.tr("Log out")}}</span></a>
 %else:
-<a href="/login" class="button"><i class="fa fa-sign-in"></i><span class="caption"> Войти</span></a>
+<a href="/login" class="button"><i class="fa fa-sign-in"></i><span class="caption"> {{i18n.tr("Log in")}}</span></a>
 %end
 </div>
 </div>
 
 <div id="echolist">
 <div id="conferences">
-<center><b>Список конференций</b></center>
+<center><b>{{i18n.tr("Conferences")}}</b></center>
 %unread = False
 %for echoarea in allechoareas:
 %if echoarea[2] == 0:
@@ -41,8 +41,8 @@
 %end
 %if unread:
 <hr>
-<a href="/readall" class="new-button-link" title="Прочитано">
-<i class="fa fa-check-square"></i> Очистить</a>
+<a href="/readall" class="new-button-link" title="{{i18n.tr("New")}}">
+<i class="fa fa-check-square"></i> {{i18n.tr("Mark readed")}}</a>
 %end
 </div>
 </div>

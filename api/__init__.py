@@ -23,6 +23,11 @@ c.execute("CREATE INDEX IF NOT EXISTS time ON 'msg' ('time');")
 c.execute("CREATE INDEX IF NOT EXISTS subject ON 'msg' ('subject');")
 c.execute("CREATE INDEX IF NOT EXISTS body ON 'msg' ('body');")
 con.commit()
+con.close()
+
+def connect():
+    conn = sqlite3.connect("idec.db")
+    return conn
 
 def check_config():
     if not os.path.exists("iing.cfg"):
@@ -130,6 +135,7 @@ def get_echo_msgids(echo):
         return vea_call(vea, 'get_echo_msgids')
 
     msgids = []
+    c = connect().cursor()
     for row in c.execute("SELECT msgid FROM msg WHERE echoarea = ? ORDER BY id;", (echo,)):
         if len(row[0]) > 0:
             msgids.append(row[0])
@@ -149,6 +155,7 @@ def get_echoarea(echoarea):
         return []
 
 def get_msg(msgid):
+    c = connect().cursor()
     try:
         row = c.execute("SELECT tags, echoarea, time, fr, addr, t, subject, body FROM msg WHERE msgid = ?;", (msgid,)).fetchone()
         return "\n".join([row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], "", row[7]])
@@ -159,10 +166,10 @@ def get_echoarea_count(echoarea):
     vea = is_vea(echoarea, 'get_echoarea_count')
     if vea:
         return vea_call(vea, 'get_echoarea_count')
-
     r = 0
     try:
-        q = c.execute("SELECT msgid FROM msg WHERE echoarea = ?;", (echoarea,))
+        c = connect().cursor()
+        q = c.execute("SELECT msgid FROM msg WHERE echoarea = ?;", (echoarea, ))
     except:
         return 0
     for row in q:
@@ -175,6 +182,7 @@ def get_last_msg(echoarea):
         return vea_call(vea, 'get_last_msg')
 
     try:
+        c = connect().cursor()
         row = c.execute("SELECT tags, echoarea, time, fr, addr, t, subject, body FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()
         msg = [row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], row[7]]
     except:
@@ -187,12 +195,14 @@ def get_last_msgid(echoarea):
         return vea_call(vea, 'get_last_msgid')
 
     try:
+        c = connect().cursor()
         return c.execute("SELECT msgid FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()[0]
     except:
         return False
 
 def delete_msg(msgid):
-    c.execute("DELETE FROM msg WHERE msgid = ?", (msgid,))
+    con = connect()
+    con.cursor().execute("DELETE FROM msg WHERE msgid = ?", (msgid,))
     con.commit()
 
 def formatted_time(timestamp):
@@ -203,6 +213,7 @@ def rss_time(timestamp):
 
 def get_time(echoarea):
     try:
+        c = connect().cursor()
         time = c.execute("SELECT time FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()[0]
     except:
         time = 0
@@ -316,7 +327,8 @@ def toss_msg(msgfrom, addr, tmsg):
                 if h in l:
                     return "error:duplicate msgid"
                 msg = msg.split("\n")
-                c.execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (h, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
+                con = connect()
+                con.cursor().execute("INSERT INTO msg (msgid, tags, echoarea, time, fr, addr, t, subject, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (h, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], "\n".join(msg[8:])))
                 con.commit()
                 return "msg ok:" + h
             else:
@@ -452,7 +464,8 @@ def get_fechoarea(fechoarea):
 
 def edit_msg(msgid, subj, msgbody):
     msgbody = spoiler_body(msgbody)
-    c.execute("UPDATE msg SET subject = ?, body = ? WHERE msgid = ?;", (subj, msgbody, msgid))
+    con = connect()
+    con.cursor().execute("UPDATE msg SET subject = ?, body = ? WHERE msgid = ?;", (subj, msgbody, msgid))
     con.commit()
     return "msg ok:" + msgid
 
@@ -502,6 +515,7 @@ def mail_last_msgid(auth):
             return False
     addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
+        c = connect()
         return c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? ) ORDER BY id DESC LIMIT 1;", (username, addr)).fetchone()[0]
     except:
         return False
@@ -512,6 +526,7 @@ def mail_echo_msgids(auth):
     if username == "":
             return msgids
     addr = "%<" + nodename + "," + str(addr) + ">%"
+    c = connect()
     for row in c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? ) ORDER BY id;", (username, addr)):
         msgids.append(row[0])
     return msgids
@@ -523,6 +538,7 @@ def mail_echoarea_count(auth):
             return r
     addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
+        c = connect()
         q = c.execute("SELECT msgid FROM msg WHERE ( t = ? or t like ? );", (username, addr))
     except:
         return 0
@@ -536,6 +552,7 @@ def from_last_msgid(auth):
             return False
     addr = nodename + "," + str(addr)
     try:
+        c = connect()
         return c.execute("SELECT msgid FROM msg WHERE ( addr = ? ) ORDER BY id DESC LIMIT 1;", (addr, )).fetchone()[0]
     except:
         return False
@@ -546,6 +563,7 @@ def from_echo_msgids(auth):
     if username == "":
             return msgids
     addr = nodename + "," + str(addr)
+    c = connect()
     for row in c.execute("SELECT msgid FROM msg WHERE ( addr = ? ) ORDER BY id;", (addr,)):
         msgids.append(row[0])
     return msgids
@@ -556,6 +574,7 @@ def from_echoarea_count(auth):
     if username == "":
             return r
     addr = nodename + "," + str(addr)
+    c = connect()
     q = c.execute("SELECT msgid FROM msg WHERE ( addr = ? );", (addr, ))
     for row in q:
         r += 1
@@ -569,12 +588,14 @@ def mail_decode(auth):
 
 def netmail_last_msgid(auth):
     try:
+        c = connect()
         return c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
     except:
         return False
 
 def netmail_echo_msgids(auth):
     msgids = []
+    c = connect()
     for row in c.execute("SELECT msgid, t FROM msg WHERE t like '%<%>%' ORDER BY id;"):
         msgids.append(row[0])
     return msgids
@@ -582,6 +603,7 @@ def netmail_echo_msgids(auth):
 def netmail_echoarea_count(auth):
     r = 0
     try:
+        c = connect()
         q = c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
     except:
         return 0
@@ -591,7 +613,7 @@ def netmail_echoarea_count(auth):
 
 virtual_ea = {
     '.query' : {
-        'name': 'Поиск',
+        'name': 'Search',
         'cache' : { },
         'decode': query_decode,
         'get_last_msgid': query_last_msgid,
@@ -599,14 +621,14 @@ virtual_ea = {
         'get_echoarea_count': query_echoarea_count,
     },
     'mail.to' : {
-        'name': 'Для',
+        'name': 'To',
         'decode': mail_decode,
         'get_last_msgid': mail_last_msgid,
         'get_echo_msgids': mail_echo_msgids,
         'get_echoarea_count': mail_echoarea_count,
     },
     'mail.from' : {
-        'name': 'От',
+        'name': 'From',
         'decode': mail_decode,
         'get_last_msgid': from_last_msgid,
         'get_echo_msgids': from_echo_msgids,
