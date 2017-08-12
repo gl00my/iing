@@ -136,7 +136,6 @@ def echoes(subscription):
     return allechoareas
 
 def subscriptions():
-    api.load_config()
     if api.nosubscription:
         subscription = api.subscribes
         if len(subscription) == 0:
@@ -182,12 +181,16 @@ def index():
     echoareas = []
     subscription = subscriptions()
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
-    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True): #[0:5]:
+    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True):#[0:5]:
         if api.is_vea(echoarea[0]):
             continue
-        last = api.get_last_msgid(echoarea[0])
-        page = get_pages(len(api.get_echoarea(echoarea[0])))
-        echoareas.append({"echoname": echoarea[0], "count": api.get_echoarea_count(echoarea[0]), "dsc": echoarea[1], "msg": api.get_last_msg(echoarea[0]), "last": last, "page": page})
+        msgids = api.get_echoarea(echoarea[0])
+        if len(msgids) > 0:
+            last = msgids[-1]
+        else:
+            last = False
+        page = get_pages(len(msgids))
+        echoareas.append({"echoname": echoarea[0], "count": len(msgids), "dsc": echoarea[1], "msg": api.get_msg(last), "last": last, "page": page})
     allechoareas = echoes(subscription)
     auth = request.get_cookie("authstr")
     msgfrom, addr = points.check_point(auth)
@@ -223,7 +226,6 @@ def echolist():
     return template("tpl/echolist.tpl", nodename=api.nodename, dsc=api.nodedsc, allechoareas=allechoareas, addr=addr, auth=auth, background=api.background, nosubscription=api.nosubscription, feed=feed)
 
 def ffeed(echoarea, msgid, page):
-    api.load_config()
     msglist = api.get_echoarea(echoarea)
     result = []
     last = msgid
@@ -238,7 +240,7 @@ def ffeed(echoarea, msgid, page):
     start = page * 50 - 50
     end = start + 50
     for mid in msglist[start:end]:
-        msg = api.get_msg(mid).split("\n")
+        msg = api.get_msg(mid)
         if len(msg) > 1:
             result.append([mid, msg])
     ea = [ea for ea in api.echoareas if ea[0] == echoarea]
@@ -300,9 +302,8 @@ def echoareas(e1, e2, msgid=False, page=False):
 
 @route("/<msgid>")
 def showmsg(msgid):
-    api.load_config()
     if api.msg_filter(msgid):
-        body = api.get_msg(msgid).split("\n")
+        body = api.get_msg(msgid)
         if body != [""]:
             msgfrom, addr = points.check_point(request.get_cookie("authstr"))
             kludges = body[0].split("/")
@@ -352,11 +353,10 @@ def showmsg(msgid):
 @route("/msglist/<echoarea>/<msgid>")
 @route("/msglist/<echoarea>/<msgid>/<page>")
 def msg_list(echoarea, page=False, msgid=False):
-    api.load_config()
     msglist = api.get_echoarea(echoarea)
     result = []
     for mid in msglist:
-        msg = api.get_msg(mid).split("\n")
+        msg = api.get_msg(mid)
         try:
             subject = msg[6]
             f = msg[3]
@@ -388,7 +388,7 @@ def reply(e1, e2, msgid = False):
         return redirect("/")
     auth = request.get_cookie("authstr")
     if msgid:
-        msg = api.get_msg(msgid).split("\n")
+        msg = api.get_msg(msgid)
     else:
         msg = False
     return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background, addr = False)
@@ -431,7 +431,6 @@ def save_messsage(echoarea, msgid = False):
 @post("/s/subscription")
 @route("/s/subscription")
 def subscription():
-    api.load_config()
     s = request.forms.get("subscription")
     subscription = []
     if request.forms.get("default"):
@@ -556,11 +555,10 @@ def registration():
 @route("/rss/<echoarea>")
 def rss(echoarea):
     response.set_header("content-type", "application/rss+xml; charset=utf-8")
-    api.load_config()
     msglist = api.get_echoarea(echoarea)
     msgs = []
     for msgid in msglist[-50:]:
-        msgs.append([msgid, api.get_msg(msgid).split("\n")])
+        msgs.append([msgid, api.get_msg(msgid)])
     return template("tpl/rss.tpl", nodename=api.nodename, dsc=api.nodedsc, nodeurl=api.nodeurl, msgs=reversed(msgs), echoarea=echoarea)
 
 @route("/lib/css/<filename>")
@@ -580,7 +578,7 @@ def edit(e1, e2, msgid):
     echoarea = e1 + "." + e2
     auth = request.get_cookie("authstr")
     if points.is_operator(auth):
-        msg = api.get_msg(msgid).split("\n")
+        msg = api.get_msg(msgid)
         return template("tpl/edit.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background)
     redirect("/")
 
@@ -598,7 +596,6 @@ def edit_messsage(echoarea, msgid):
 @route("/favorites")
 @route("/favorites/<msgid>")
 def favorites(msgid = False):
-    api.load_config()
     favlist = []
     lst = []
     for n in os.listdir("favorites"):
@@ -629,7 +626,6 @@ def favlist_add(fname, msgid):
 @route("/favlist/<fname>/<msgid>")
 @route("/favlist/<fname>/<msgid>/<page>")
 def sticky_list(fname, page=False, msgid=False):
-    api.load_config()
     try:
         msglist = open("favorites/" + fname + ".txt", "r").read().split("\n")
     except:
@@ -638,7 +634,7 @@ def sticky_list(fname, page=False, msgid=False):
     msglist = msglist[1:]
     result = []
     for mid in msglist:
-        msg = api.get_msg(mid).split("\n")
+        msg = api.get_msg(mid)
         try:
             subject = msg[6]
             f = msg[3]
@@ -662,5 +658,6 @@ def search(e1, e2):
     return redirect("/.query@"+ urllib.parse.quote(echoarea) + "@" + urllib.parse.quote(regexp))
 
 @hook('before_request')
-def language():
+def loadconf():
     i18n.setlang(get_lang())
+    api.load_config()

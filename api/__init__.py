@@ -158,9 +158,9 @@ def get_msg(msgid):
     c = connect().cursor()
     try:
         row = c.execute("SELECT tags, echoarea, time, fr, addr, t, subject, body FROM msg WHERE msgid = ?;", (msgid,)).fetchone()
-        return "\n".join([row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], "", row[7]])
+        return [row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], "", row[7]]
     except:
-        return ""
+        return []
 
 def get_echoarea_count(echoarea):
     vea = is_vea(echoarea, 'get_echoarea_count')
@@ -212,6 +212,9 @@ def rss_time(timestamp):
     return time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime(int(timestamp)))
 
 def get_time(echoarea):
+    vea = is_vea(echoarea, 'get_time')
+    if vea:
+        return vea_call(vea, 'get_time')
     try:
         c = connect().cursor()
         time = c.execute("SELECT time FROM msg WHERE echoarea = ? ORDER BY id DESC LIMIT 1;", (echoarea,)).fetchone()[0]
@@ -483,7 +486,7 @@ def query_echo_msgids(arg, cache = False):
     echoarea_msglist = get_echoarea(echoarea)
 
     for msgid in echoarea_msglist:
-        msg = get_msg(msgid).split("\n")
+        msg = get_msg(msgid)
         msgp = "\n".join(msg[3:])
         if p.search(msgp):
             messages.append(msgid)
@@ -512,7 +515,7 @@ def query_decode(arg):
 def mail_last_msgid(auth):
     username, addr = points.check_point(auth)
     if username == "":
-            return False
+        return False
     addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
         c = connect()
@@ -611,6 +614,9 @@ def netmail_echoarea_count(auth):
         r += 1
     return r
 
+def null_get_time(m):
+    return 0
+
 virtual_ea = {
     '.query' : {
         'name': 'Search',
@@ -623,6 +629,7 @@ virtual_ea = {
     'mail.to' : {
         'name': 'To',
         'decode': mail_decode,
+        'get_time': null_get_time,
         'get_last_msgid': mail_last_msgid,
         'get_echo_msgids': mail_echo_msgids,
         'get_echoarea_count': mail_echoarea_count,
@@ -630,6 +637,7 @@ virtual_ea = {
     'mail.from' : {
         'name': 'From',
         'decode': mail_decode,
+        'get_time': null_get_time,
         'get_last_msgid': from_last_msgid,
         'get_echo_msgids': from_echo_msgids,
         'get_echoarea_count': from_echoarea_count,
