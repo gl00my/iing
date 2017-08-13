@@ -366,7 +366,7 @@ def body_render(body):
     rr = re.compile("(ii:\/\/)([a-z0-9_!.-]{1,60}\.[a-z0-9_!.-]{1,59}[a-z0-9_!-])")
     body = rr.sub(r"<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='\2'>\2</a>", body)
     rr = re.compile("(ii:\/\/)([a-z0-9A-Z]{20})")
-    body = rr.sub(r"<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='\2'>\2</a>", body)
+    body = rr.sub(r"<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='/\2'>\2</a>", body)
     rr = re.compile("((^|\n)(== ).+)")
     body = rr.sub(r"<h3 class='title'>\1</h3>", body)
     rr = re.compile("((^|\n)----)")
