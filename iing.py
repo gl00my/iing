@@ -63,7 +63,7 @@ def outmsg(msgids):
     for msgid in msgids.split("/"):
         result = result + msgid + ":"
         try:
-            msg = str.encode(api.get_msg(msgid))
+            msg = str.encode("\n".join(api.get_msg(msgid)))
             result = result + (base64.b64encode(msg)).decode("utf-8") + "\n"
         except:
             result = result + "\n"
@@ -101,7 +101,7 @@ def e(echoarea):
 def m(msgid):
     response.set_header("content-type", "text/plain; charset=utf-8")
     try:
-        return api.get_msg(msgid)
+        return "\n".join(api.get_msg(msgid))
     except:
         return ""
 
