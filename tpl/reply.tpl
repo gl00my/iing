@@ -39,10 +39,10 @@
 <br>
 <center>
 %if msgid:
-<form method="post" enctype="multipart/form-data" action="/a/savemsg/{{echoarea}}/{{msgid}}">
+<form method="post" enctype="multipart/form-data" action="/reply/{{echoarea}}/{{msgid}}">
 <input type="hidden" name="to" value="{{to}}">
 %else:
-<form method="post" enctype="multipart/form-data" action="/a/savemsg/{{echoarea}}">
+<form method="post" enctype="multipart/form-data" action="/new/{{echoarea}}">
 <input type="text" name="to" class="input input_line" placeholder="{{i18n.tr('To')}}" value="{{to}}"><br>
 %end
 <input type="hidden" name="repto" value="{{repto}}">
@@ -57,12 +57,8 @@
 %else:
 <input type="hidden" name="authstr" class="input input_line" placeholder="auth-str" value={{auth}}><br>
 %end
-<button type="submit" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Send')}}</button>
-%if msgid:
-<button type="submit" formaction="/reply/{{echoarea}}/{{msgid}}" class="form-button"><i class="fa fa-eye"></i> {{i18n.tr('Preview')}}</button>
-%else:
-<button type="submit" formaction="/new/{{echoarea}}" class="form-button"><i class="fa fa-eye"></i> {{i18n.tr('Preview')}}</button>
-%end
+<button type="submit" name="action" value="submit" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Send')}}</button>
+<button type="submit" name="action" value="preview" class="form-button"><i class="fa fa-eye"></i> {{i18n.tr('Preview')}}</button>
 </form>
 
 %if msgbody:

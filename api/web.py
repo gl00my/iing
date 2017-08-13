@@ -384,10 +384,12 @@ def msg_list(echoarea, page=False, msgid=False):
 @post("/reply/<e1>.<e2>/<msgid>")
 @post("/new/<e1>.<e2>")
 def reply(e1, e2, msgid = False):
+    echoarea = e1 + "." + e2
+    if request.POST and request.POST.action == "submit":
+        return save_message(echoarea, msgid)
     addr = request.forms.get("to")
     subj = request.forms.get("subj")
     msgbody = request.forms.get("msgbody")
-    echoarea = e1 + "." + e2
     if api.is_vea(echoarea):
         return redirect("/")
     auth = request.get_cookie("authstr")
@@ -408,7 +410,7 @@ def private(addr = False):
 
 @post("/a/savemsg/<echoarea>")
 @post("/a/savemsg/<echoarea>/<msgid>")
-def save_messsage(echoarea, msgid = False):
+def save_message(echoarea, msgid = False):
     if api.echo_filter(echoarea):
         subj = request.forms.get("subj")
         msgbody = request.forms.get("msgbody")
