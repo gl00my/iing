@@ -485,6 +485,9 @@ def subscription():
     if request.forms.get("default"):
         for ea in api.echoareas:
             subscription.append(ea[0])
+        for ea in s.strip().replace("\r", "").split("\n"):
+            if not ea in subscription:
+                subscription.append(ea)
         set_subscription(subscription)
         redirect("/")
     if request.POST:
