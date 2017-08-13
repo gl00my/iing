@@ -59,9 +59,9 @@
 %end
 <button type="submit" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Send')}}</button>
 %if msgid:
-<button type="submit" formaction="/reply/{{echoarea}}/{{msgid}}" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Preview')}}</button>
+<button type="submit" formaction="/reply/{{echoarea}}/{{msgid}}" class="form-button"><i class="fa fa-eye"></i> {{i18n.tr('Preview')}}</button>
 %else:
-<button type="submit" formaction="/new/{{echoarea}}" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Preview')}}</button>
+<button type="submit" formaction="/new/{{echoarea}}" class="form-button"><i class="fa fa-eye"></i> {{i18n.tr('Preview')}}</button>
 %end
 </form>
 
