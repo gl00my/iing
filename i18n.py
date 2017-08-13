@@ -66,6 +66,7 @@ t = {
         'Spoilers': 'Спойлеры',
         'Headers and splitters': 'Заголовки и очерчивания',
         'Language': 'Язык',
+        'Preview': 'Предпросмотр',
     },
 }
 

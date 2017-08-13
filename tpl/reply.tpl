@@ -1,19 +1,25 @@
-%import i18n
+%import i18n, api
 %include tpl/header.tpl nodename=nodename, dsc=dsc, hidemenu=True, background=background
+
 %if msgid:
 %title=i18n.tr("Reply to")+ " " + msgid
 %echoarea=msg[1]
 %repto = msgid
 %to = msg[3]
+%if not subj:
 %subj = msg[6]
 %if not subj.startswith("Re: "):
 %subj = "Re: " + subj
+%end
 %end
 %else:
 %title=i18n.tr("New message in") + " " + echoarea
 %repto = ""
 %to = addr or "All"
-%subj = False
+%end
+%text = ""
+%if msgbody:
+%text = msgbody
 %end
 <div id="panel">
 <div id="buttons">
@@ -23,11 +29,10 @@
 </div>
 <br>
 <div id="conferences" class="width90">
-%if msgid:
+
+%if msg:
 <div class="single-message reply">
-%for line in msg[8:]:
-{{line}}<br>
-%end
+{{!api.body_render("\n".join(msg[8:]))}}
 </div><br>
 %end
 
@@ -46,15 +51,27 @@
 %else:
 <input type="text" name="subj" class="input input_line" placeholder="{{i18n.tr('Subject')}}"><br>
 %end
-<textarea name="msgbody" cols="80" rows=10" class="input" placeholder="{{i18n.tr('Enter the text body')}}"></textarea><br>
+<textarea name="msgbody" cols="80" rows=10" class="input" placeholder="{{i18n.tr('Enter the text body')}}">{{text}}</textarea><br>
 %if not auth:
 <input type="text" name="authstr" class="input input_line" placeholder="{{i18n.tr('auth-key')}}"><br>
 %else:
 <input type="hidden" name="authstr" class="input input_line" placeholder="auth-str" value={{auth}}><br>
 %end
 <button type="submit" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Send')}}</button>
-<!-- <button type="submit" formaction="/new/{{echoarea}}" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Preview')}}</button> -->
+%if msgid:
+<button type="submit" formaction="/reply/{{echoarea}}/{{msgid}}" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Preview')}}</button>
+%else:
+<button type="submit" formaction="/new/{{echoarea}}" class="form-button"><i class="fa fa-share-square"></i> {{i18n.tr('Preview')}}</button>
+%end
 </form>
+
+%if msgbody:
+<br>
+<div class="single-message reply">
+{{!api.body_render(api.spoiler_body(msgbody))}}
+</div><br>
+%end
+
 </center>
 
 <hr/>

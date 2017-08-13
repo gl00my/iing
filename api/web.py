@@ -381,8 +381,12 @@ def msg_list(echoarea, page=False, msgid=False):
 @route("/new/<e1>.<e2>")
 @route("/reply/<e1>.<e2>")
 @route("/reply/<e1>.<e2>/<msgid>")
+@post("/reply/<e1>.<e2>/<msgid>")
+@post("/new/<e1>.<e2>")
 def reply(e1, e2, msgid = False):
-#    msgbody = request.forms.get("msgbody")
+    addr = request.forms.get("to")
+    subj = request.forms.get("subj")
+    msgbody = request.forms.get("msgbody")
     echoarea = e1 + "." + e2
     if api.is_vea(echoarea):
         return redirect("/")
@@ -391,7 +395,7 @@ def reply(e1, e2, msgid = False):
         msg = api.get_msg(msgid)
     else:
         msg = False
-    return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background, addr = False)
+    return template("tpl/reply.tpl", msgbody = msgbody or False, nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=msgid, msg=msg, auth=auth, hidehome=False, topiclist=False, background=api.background, addr = addr or False, subj = subj)
 
 @route("/private")
 @route("/private/<addr>")
@@ -400,7 +404,7 @@ def private(addr = False):
     if not auth:
         return redirect("/")
     echoarea = "private." + api.hsh(auth + str(time.time())).lower()
-    return template("tpl/reply.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=False, msg=False, addr = addr, auth=auth, hidehome=False, topiclist=False, background=api.background)
+    return template("tpl/reply.tpl", msgbody = False, nodename=api.nodename, dsc=api.nodedsc, echoarea=echoarea, msgid=False, msg=False, addr = addr, auth=auth, hidehome=False, topiclist=False, background=api.background, subj = False)
 
 @post("/a/savemsg/<echoarea>")
 @post("/a/savemsg/<echoarea>/<msgid>")
