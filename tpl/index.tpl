@@ -82,10 +82,10 @@
 %for echoarea in echoareas:
 %last_msgid = api.get_last_msgid(echoarea["echoname"])
 %if feed == 1 and echoarea["last"]:
-<a class="echoarea-link" href="/{{echoarea["echoname"]}}/{{echoarea["page"]}}/{{echoarea["last"]}}#{{echoarea["last"]}}"><h2 class="echo-title">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i>
+<a class="echoarea-link" href="/{{echoarea["echoname"]}}/{{echoarea["page"]}}/{{echoarea["last"]}}#{{echoarea["last"]}}"><h2 class="echo-title">{{echoarea["dsc"]}}</a> <i class="fa fa-envelope-o"></i>
 {{echoarea["count"]}}</h2>
 %else:
-<a class="echoarea-link" href="/{{echoarea["echoname"]}}"><h2 class="echo-title">{{echoarea["echoname"]}}</a> <i class="fa fa-envelope-o"></i>
+<a class="echoarea-link" href="/{{echoarea["echoname"]}}"><h2 class="echo-title">{{echoarea["dsc"]}}</a> <i class="fa fa-envelope-o"></i>
 {{echoarea["count"]}}</h2>
 %end
 %if len(echoarea["msg"]) > 0:

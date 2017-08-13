@@ -16,6 +16,11 @@
 %if feed == 0:
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>
 %end
+%if subscribe:
+<a href="/unsubscribe/{{echoarea[0]}}" class="button"><i class="fa fa-minus-circle"></i><span class="caption"> {{i18n.tr("Unsubscribe")}}</span></a>
+%else:
+<a href="/subscribe/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> {{i18n.tr("Subscribe")}}</span></a>
+%end
 <a href="/new/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> {{i18n.tr("New")}}</span></a>
 <a href="/msglist/{{echoarea[0]}}/{{msgid}}" class="button"><i class="fa fa-list"></i><span class="caption"> {{i18n.tr('List')}}</span></a>
 </div>

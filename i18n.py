@@ -67,6 +67,8 @@ t = {
         'Headers and splitters': 'Заголовки и очерчивания',
         'Language': 'Язык',
         'Preview': 'Предпросмотр',
+        'Subscribe': 'Подписаться',
+        'Unsubscribe': 'Отписаться',
     },
 }
 

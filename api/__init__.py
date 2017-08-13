@@ -189,6 +189,19 @@ def get_last_msg(echoarea):
         msg = []
     return msg
 
+def get_first_msg(echoarea):
+    vea = is_vea(echoarea, 'get_first_msg')
+    if vea:
+        return vea_call(vea, 'get_first_msg')
+
+    try:
+        c = connect().cursor()
+        row = c.execute("SELECT tags, echoarea, time, fr, addr, t, subject, body FROM msg WHERE echoarea = ? ORDER BY id LIMIT 1;", (echoarea,)).fetchone()
+        msg = [row[0], row[1], str(row[2]), row[3], row[4], row[5], row[6], row[7]]
+    except:
+        msg = []
+    return msg
+
 def get_last_msgid(echoarea):
     vea = is_vea(echoarea, 'get_last_msgid')
     if vea:

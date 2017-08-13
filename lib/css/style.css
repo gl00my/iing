@@ -203,7 +203,7 @@ hr {
 
 .new-button-link {
     font-size: 10pt;
-    display: block;
+    display: inline-block;
     background: #43ac6a;
     color: #ffffff;
     width: 170px;

@@ -10,7 +10,13 @@
 <div id="rbuttons">
 <form id="search" class="query" method="get" action="/search/{{echoarea[0]}}"><input class="input_line" name="regexp" placeholder="regexp" value="" type="text"/></form>
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>
+
 %if not api.is_vea(echoarea[0]):
+%if subscribe:
+<a href="/unsubscribe/{{echoarea[0]}}" class="button"><i class="fa fa-minus-circle"></i><span class="caption"> {{i18n.tr("Unsubscribe")}}</span></a>
+%else:
+<a href="/subscribe/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> {{i18n.tr("Subscribe")}}</span></a>
+%end
 <a href="/new/{{echoarea[0]}}" class="button"><i class="fa fa-plus-circle"></i><span class="caption"> {{i18n.tr("New")}}</span></a>
 %end
 </div>

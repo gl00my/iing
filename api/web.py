@@ -91,6 +91,13 @@ def get_lang():
 def set_lang(lang):
     return set_user_conf("lang", lang)
 
+def private_echo_name(ea):
+    m = api.get_first_msg(ea)
+    if m:
+        return (m[3] + " / " + m[5])
+    else:
+        return (ea[0:8] + "...")
+
 def echoes(subscription):
     allechoareas = []
 
@@ -102,7 +109,7 @@ def echoes(subscription):
         echoarea_msglist = api.get_echoarea(echoarea[0])
 
         if current in echoarea_msglist:
-            new = int(api.get_echoarea_count(echoarea[0])) - echoarea_msglist.index(current) - 1
+            new = len(echoarea_msglist) - echoarea_msglist.index(current) - 1
         else:
             new = 0
             current = False
@@ -121,13 +128,15 @@ def echoes(subscription):
         temp.append(last)
 
         if last:
-            temp.append(get_page(api.get_echoarea(echoarea[0]).index(last)))
+            temp.append(get_page(echoarea_msglist.index(last)))
         else:
-            temp.append(get_pages(len(api.get_echoarea(echoarea[0]))))
+            temp.append(get_pages(len(echoarea_msglist)))
 
         vea = api.is_vea(echoarea[0])
         if vea:
             temp.append(i18n.tr(vea[2]) + ": " + vea[3])
+        elif echoarea[0].startswith("private."):
+            temp.append(echoarea[1])
         else:
             temp.append(echoarea[0])
 
@@ -165,9 +174,12 @@ def subscriptions():
     s = subscription
     subscription = []
     for ea in s:
+        if ea.startswith("private."):
+            subscription.append([ea, private_echo_name(ea)])
         for e in api.echoareas:
-            if ea in e:
+            if ea == e[0]:
                 subscription.append(e)
+                break
 
     auth = request.get_cookie("authstr")
     if auth:
@@ -176,12 +188,32 @@ def subscriptions():
 
     return subscription
 
+@route("/subscribe/<ea>")
+def subscribe(ea):
+    if not api.echo_filter(ea):
+        return redirect("/")
+    s = get_subscription()
+    if not (ea in s):
+        s.append(ea)
+        set_subscription(s)
+    return redirect("/" + ea)
+
+@route("/unsubscribe/<ea>")
+def unsubscribe(ea):
+    ns = []
+    s = get_subscription()
+    for e in s:
+        if ea != e:
+            ns.append(e)
+    set_subscription(ns)
+    return redirect("/")
+
 @route("/")
 def index():
     echoareas = []
     subscription = subscriptions()
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
-    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True):#[0:5]:
+    for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True):
         if api.is_vea(echoarea[0]):
             continue
         msgids = api.get_echoarea(echoarea[0])
@@ -255,7 +287,7 @@ def ffeed(echoarea, msgid, page):
     else:
         if ea[0].startswith("private."):
             ea.append(i18n.tr("Private correspondence"))
-            ea[1] = ea[0][8:]
+            ea[1] = private_echo_name(ea[0])
         else:
             ea.append(ea[0])
 
@@ -265,8 +297,12 @@ def ffeed(echoarea, msgid, page):
     else:
         end = msglist[end]
     set_last_cookie(echoarea, end)
-
-    return template("tpl/feed.tpl", nodename=api.nodename, dsc=api.nodedsc, echoarea=ea, page=page, msgs=result, msgid=msgid, background=api.background, auth=auth)
+    ss = get_subscription()
+    if echoarea in ss:
+        ss = True
+    else:
+        ss = False
+    return template("tpl/feed.tpl", subscribe = ss, nodename=api.nodename, dsc=api.nodedsc, echoarea=ea, page=page, msgs=result, msgid=msgid, background=api.background, auth=auth)
 
 @route("/<e1>.<e2>")
 @route("/<e1>.<e2>/<page>")
@@ -338,12 +374,17 @@ def showmsg(msgid):
                 feed = int(feed)
             if feed == 1:
                 try:
-                    page = get_page(api.get_echoarea(echoarea[0]).index(msgid))
+                    page = get_page(index.index(msgid))
                 except:
-                    page = get_pages(api.get_echoarea_count(echoarea[0]))
+                    page = get_pages(len(index))
             else:
                 page = False
-            return template("tpl/message.tpl", nodename=api.nodename, echoarea=echoarea, index=index, msgid=msgid, repto=repto, current=current, time=t, point=point, address=address, to=to, subj=subj, body=body, msgfrom=msgfrom, background=api.background, auth=auth, feed=feed, page=page)
+            ss = get_subscription()
+            if echoarea[0] in ss:
+                ss = True
+            else:
+                ss = False
+            return template("tpl/message.tpl", subscribe = ss, nodename=api.nodename, echoarea=echoarea, index=index, msgid=msgid, repto=repto, current=current, time=t, point=point, address=address, to=to, subj=subj, body=body, msgfrom=msgfrom, background=api.background, auth=auth, feed=feed, page=page)
         else:
             redirect("/")
     else:
@@ -430,6 +471,8 @@ def save_message(echoarea, msgid = False):
             msg = base64.b64encode(msg.encode("utf8"))
             message=api.toss_msg(msgfrom, addr, msg)
             if message.startswith("msg ok"):
+                if echoarea.startswith("private."):
+                    subscribe(echoarea)
                 redirect("/%s" % message[7:])
             return message
     redirect("/")
