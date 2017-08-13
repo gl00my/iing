@@ -3,7 +3,7 @@
 import hashlib, random, base64, re, fcntl
 
 def username_filter(name):
-    rr = re.compile(r'[^<>:%]{1,16}$')
+    rr = re.compile(r'[^<>:/%]{1,16}$')
     if rr.match(name): return True
 
 def is_point(auth):
