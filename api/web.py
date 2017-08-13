@@ -604,14 +604,20 @@ def registration():
     else:
         redirect("/")
 
-@route("/rss/<echoarea>")
-def rss(echoarea):
+@route("/rss/<eas:path>")
+def rss(eas):
     response.set_header("content-type", "application/rss+xml; charset=utf-8")
-    msglist = api.get_echoarea(echoarea)
     msgs = []
-    for msgid in msglist[-50:]:
-        msgs.append([msgid, api.get_msg(msgid)])
-    return template("tpl/rss.tpl", nodename=api.nodename, dsc=api.nodedsc, nodeurl=api.nodeurl, msgs=reversed(msgs), echoarea=echoarea)
+    echoarea = ""
+    for ea in eas.split("/"):
+        msglist = api.get_echoarea(ea)
+        if echoarea != "":
+            echoarea += " / "
+        echoarea += ea
+        for msgid in msglist[-50:]:
+            msgs.append([msgid, api.get_msg(msgid)])
+    msgs = sorted(msgs, key = lambda m: m[1][2], reverse=True)
+    return template("tpl/rss.tpl", nodename=api.nodename, dsc=api.nodedsc, nodeurl=api.nodeurl, msgs=msgs, echoarea=echoarea)
 
 @route("/lib/css/<filename>")
 def pcss(filename):
