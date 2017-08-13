@@ -188,14 +188,19 @@ def subscriptions():
 
     return subscription
 
-@route("/subscribe/<ea>")
 def subscribe(ea):
     if not api.echo_filter(ea):
-        return redirect("/")
+        return False
     s = get_subscription()
     if not (ea in s):
         s.append(ea)
         set_subscription(s)
+    return True
+
+@route("/subscribe/<ea>")
+def routesubscribe(ea):
+    if not subscribe(ea):
+        return redirect("/")
     return redirect("/" + ea)
 
 @route("/unsubscribe/<ea>")
