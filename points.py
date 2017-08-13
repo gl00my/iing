@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import hashlib, random, base64, re
+import hashlib, random, base64, re, fcntl
 
 def username_filter(name):
     rr = re.compile(r'[^<>%]{1,16}$')
@@ -75,7 +75,12 @@ def hsh(str):
 def save_point(phash, user, hsh):
     addrs = []
     m = 0
-    for point in open("points.txt", "r").read().split("\n"):
+    f = open("points.txt", "r+")
+    try:
+        fcntl.lockf(f, fcntl.LOCK_EX)
+    except:
+        return False
+    for point in f.read().split("\n"):
         if len(point) > 0:
             m += 1
             row = point.split(":")
@@ -84,7 +89,10 @@ def save_point(phash, user, hsh):
         if not i in addrs:
             point = i
             break
-    open("points.txt", "a").write("%s:%s:%s:%s\n" % (hsh, phash, user, point))
+    f.seek(0)
+    f.write("%s:%s:%s:%s\n" % (hsh, phash, user, point))
+    f.truncate()
+    fcntl.lockf(f, fcntl.LOCK_UN)
 
 def make_point(user, password):
     hs = hsh(user.encode("utf-8") + password.encode("utf-8"))
