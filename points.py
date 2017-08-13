@@ -89,9 +89,7 @@ def save_point(phash, user, hsh):
         if not i in addrs:
             point = i
             break
-    f.seek(0)
     f.write("%s:%s:%s:%s\n" % (hsh, phash, user, point))
-    f.truncate()
     fcntl.lockf(f, fcntl.LOCK_UN)
 
 def make_point(user, password):
