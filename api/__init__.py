@@ -354,28 +354,69 @@ def toss_msg(msgfrom, addr, tmsg):
     else:
         return "incorrect echoarea"
 
+
+def line_render(line):
+    def href_match(o):
+        return "<span class='url'><a target='_blank' href='"+ o.group(1) + "'><i class='fa fa-link'></i> " + line_wrap(o.group(1)) +"</a></span>"
+
+    def wrap_match(o):
+        return line_wrap(o.group(0))
+
+    def quote_match(o):
+        return "<span class='quote'>" + line_wrap(o.group(1)) + "</span>"
+
+    def ps_match(o):
+        return "<span class='comment'>" + line_wrap(o.group(1)) + "</span>"
+
+    def ii_match(o):
+        return "<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='" + o.group(2) + "'>" + line_wrap(o.group(2)) + "</a>"
+
+    def ii_match2(o):
+        return "<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='" + o.group(2) +"'>" + line_wrap(o.group(2)) + "</a>"
+
+    def h_match(o):
+        return "<h3 class='title'>" + line_wrap(o.group(1)) + "</h3>"
+
+    line = line.replace("<", "&lt;").replace(">", "&gt;")
+
+    rr = re.compile("((http|https|ftp):\/\/[a-z_0-9\-.]+(:[0-9]+)?(\/[^ \t<>\n\r]+)?\/?)")
+    line = rr.sub(href_match, line)
+
+    rr = re.compile("((^|\n)[a-zA-Zа-яА-Я0-9_-]{0,20}(&gt;){1,20}.+)")
+    line = rr.sub(quote_match, line)
+
+    rr = re.compile("((^|\n)(PS|P.S|ps|ЗЫ|З.Ы|\/\/|#).*)")
+    line = rr.sub(ps_match, line)
+
+    rr = re.compile("(ii:\/\/)([a-z0-9_!.-]{1,60}\.[a-z0-9_!.-]{1,59}[a-z0-9_!-])")
+    line = rr.sub(ii_match, line)
+
+    rr = re.compile("(ii:\/\/)([a-z0-9A-Z]{20})")
+    line = rr.sub(ii_match2, line)
+
+    rr = re.compile("((^|\n)(== ).+)")
+    line = rr.sub(h_match, line)
+
+    rr = re.compile("((^|\n)----)")
+    line = rr.sub(r"<hr>", line)
+
+    rr = re.compile(">[^<]+")
+    line = rr.sub(wrap_match, line)
+
+    if not line.find("<") and not line.find(">"):
+        line = line_wrap(line)
+
+    return line
+
+def line_wrap(line):
+    if not (" " in line) and len(line) > 50:
+        line = " ".join(wrap(line, 50))
+    return line
+
 def body_render(body):
     body = body.strip()
-    body = body.replace("<", "&lt;").replace(">", "&gt;")
-    rr = re.compile("((^|\n)[a-zA-Zа-яА-Я0-9_-]{0,20}(&gt;){1,20}.+)")
-    body = rr.sub(r"<span class='quote'>\1</span>", body)
-    rr = re.compile("((^|\n)(PS|P.S|ps|ЗЫ|З.Ы|\/\/|#).*)")
-    body = rr.sub(r"\n<span class='comment'>\1</span>", body)
-    rr = re.compile("((http|https|ftp):\/\/[a-z_0-9\-.]+(:[0-9]+)?(\/[^ \t<>()\n\r]+)?\/?)")
-    body = rr.sub(r"<span class='url'><a target='_blank' href='\1'><i class='fa fa-link'></i> \1</a></span>", body)
-    rr = re.compile("(ii:\/\/)([a-z0-9_!.-]{1,60}\.[a-z0-9_!.-]{1,59}[a-z0-9_!-])")
-    body = rr.sub(r"<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='\2'>\2</a>", body)
-    rr = re.compile("(ii:\/\/)([a-z0-9A-Z]{20})")
-    body = rr.sub(r"<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='\2'>\2</a>", body)
-    rr = re.compile("((^|\n)(== ).+)")
-    body = rr.sub(r"<h3 class='title'>\1</h3>", body)
-    rr = re.compile("((^|\n)----)")
-    body = rr.sub(r"<hr>", body)
-    body = "<br>\n".join(body.split("\n"))
     txt = ""; pre = 0
     for line in body.split("\n"):
-        if not (" " in line) and len(line) > 60:
-            line = " ".join(wrap(line, 60))
         if line.startswith("====") and pre == 0:
             pre = 1
             txt += "<pre>====\n"
@@ -383,9 +424,9 @@ def body_render(body):
             pre = 0
             txt += "====</pre>\n"
         elif pre == 1:
-            txt += line.replace("<br>", "") + "\n"
+            txt += line_wrap(line) + "\n"
         else:
-            txt += line + "\n"
+            txt += line_render(line) + "<br>\n"
     if pre == 1:
         txt += "</pre>\n"
     return txt
