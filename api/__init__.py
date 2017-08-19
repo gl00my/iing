@@ -369,10 +369,10 @@ def line_render(line):
         return "<span class='comment'>" + line_wrap(o.group(1)) + "</span>"
 
     def ii_match(o):
-        return "<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='" + o.group(2) + "'>" + line_wrap(o.group(2)) + "</a>"
+        return "<i class='fa fa-plane iilink'></i>&nbsp;<a class='iilink' href='/" + o.group(2) + "'>" + line_wrap(o.group(2)) + "</a>"
 
     def ii_match2(o):
-        return "<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='" + o.group(2) +"'>" + line_wrap(o.group(2)) + "</a>"
+        return "<i class='fa fa-envelope iilink'></i>&nbsp;<a class='iilink' href='/" + o.group(2) +"'>" + line_wrap(o.group(2)) + "</a>"
 
     def h_match(o):
         return "<h3 class='title'>" + line_wrap(o.group(1)) + "</h3>"
