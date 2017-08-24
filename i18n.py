@@ -29,7 +29,7 @@ t = {
         'Reply to': 'Ответ на',
         'Mark readed': 'Очистить',
         'Sent': 'Отправленные',
-        'Received': 'CC',
+        'Received': 'Мне',
         'Edit': 'Редактировать',
         'Reply': 'Ответить',
         'Link to the message': 'Ссылка на сообщение',

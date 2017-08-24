@@ -219,8 +219,8 @@ def index():
     subscription = subscriptions()
     ea = [[echoarea[0], echoarea[1], api.get_time(echoarea[0])] for echoarea in subscription]
     for echoarea in sorted(ea, key=lambda ea: ea[2], reverse=True):
-        if api.is_vea(echoarea[0]):
-            continue
+#        if api.is_vea(echoarea[0]):
+#            continue
         msgids = api.get_echoarea(echoarea[0])
         if len(msgids) > 0:
             last = msgids[-1]

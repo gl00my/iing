@@ -577,6 +577,15 @@ def mail_last_msgid(auth):
     except:
         return False
 
+def mail_get_time(auth):
+    msgid = mail_last_msgid(auth)
+    if not msgid:
+            return 0;
+    m = get_msg(msgid)
+    if not m:
+            return 0;
+    return int(m[2])
+
 def mail_echo_msgids(auth):
     msgids = []
     username, addr = points.check_point(auth)
@@ -668,6 +677,7 @@ def netmail_echoarea_count(auth):
         r += 1
     return r
 
+
 def null_get_time(m):
     return 0
 
@@ -683,7 +693,7 @@ virtual_ea = {
     'mail.to' : {
         'name': 'To',
         'decode': mail_decode,
-        'get_time': null_get_time,
+        'get_time': mail_get_time,
         'get_last_msgid': mail_last_msgid,
         'get_echo_msgids': mail_echo_msgids,
         'get_echoarea_count': mail_echoarea_count,
