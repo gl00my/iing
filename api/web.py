@@ -94,7 +94,7 @@ def set_lang(lang):
 def private_echo_name(ea):
     m = api.get_first_msg(ea)
     if m:
-        return (m[3] + " / " + m[5])
+        return (m[3] + " / " + m[5] + " / " + m[6][:16] + "...")
     else:
         return (ea[0:8] + "...")
 
