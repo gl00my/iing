@@ -27,7 +27,7 @@ t = {
         'Search': 'Поиск',
         'Subject': 'Тема',
         'Reply to': 'Ответ на',
-        'Mark readed': 'Очистить',
+        'Mark as read': 'Очистить',
         'Sent': 'Отправленные',
         'Received': 'Мне',
         'Edit': 'Редактировать',

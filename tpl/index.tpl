@@ -70,8 +70,8 @@
 %end
 %if unread:
 <hr>
-<a href="/readall" class="new-button-link" title="{{i18n.tr("Mark readed")}}">
-<i class="fa fa-check-square"></i> {{i18n.tr("Mark readed")}}</a>
+<a href="/readall" class="new-button-link" title="{{i18n.tr("Mark as read")}}">
+<i class="fa fa-check-square"></i> {{i18n.tr("Mark as read")}}</a>
 %end
 </div>
 
