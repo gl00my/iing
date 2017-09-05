@@ -173,6 +173,11 @@ def subscriptions():
 
     s = subscription
     subscription = []
+
+    auth = request.get_cookie("authstr")
+    if auth:
+        subscription.append(["mail.to@"+auth, i18n.tr("Received")])
+
     for ea in s:
         if ea.startswith("private."):
             subscription.append([ea, private_echo_name(ea)])
@@ -180,10 +185,7 @@ def subscriptions():
             if ea == e[0]:
                 subscription.append(e)
                 break
-
-    auth = request.get_cookie("authstr")
     if auth:
-        subscription.append(["mail.to@"+auth, i18n.tr("Received")])
         subscription.append(["mail.from@"+auth, i18n.tr("Sent")])
 
     return subscription
