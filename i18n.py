@@ -11,6 +11,7 @@ t = {
         'About': 'Что это?',
         'Favorites': 'Избранное',
         'Conferences': 'Конференции',
+        'Conference': 'Конференция',
         'Login': 'Логин',
         'Address': 'Адрес',
         'Read mode': 'Режим чтения',

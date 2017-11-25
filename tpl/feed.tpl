@@ -62,6 +62,7 @@
 %else:
 %repto = False
 %end
+%e = msg[1][1]
 %t = api.formatted_time(msg[1][2])
 %point = msg[1][3]
 %address = msg[1][4]
@@ -78,7 +79,10 @@
 %end
 <b>{{i18n.tr("From")}}:</b> {{point}} ({{address}}) {{t}}<br>
 <b>{{i18n.tr("To")}}:</b> {{to}}<br>
-<b>{{i18n.tr("Subject")}}:</b> {{subj}}
+<b>{{i18n.tr("Subject")}}:</b> {{subj}}<br>
+%if e != echoarea[0]:
+<b>{{i18n.tr("Conference")}}:</b> {{e}}
+%end
 </div>
 
 %if len(body) <= 16:

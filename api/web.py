@@ -346,7 +346,7 @@ def echoareas(e1, e2, msgid=False, page=False):
 def showmsg(msgid):
     if api.msg_filter(msgid):
         body = api.get_msg(msgid)
-        if body != [""]:
+        if body != []:
             msgfrom, addr = points.check_point(request.get_cookie("authstr"))
             kludges = body[0].split("/")
             if "repto" in kludges:
@@ -635,7 +635,12 @@ def pcss(filename):
 
 @route("/lib/<filename>")
 def plib(filename):
-    return static_file(filename, root="lib/")
+    response = static_file(filename, root="lib/")
+    response.set_header("Cache-Control", "public, max-age=604800")
+    return response
+
+#   return static_file(filename, root="lib/")
+
 
 @route("/edit/<e1>.<e2>/<msgid>")
 def edit(e1, e2, msgid):
