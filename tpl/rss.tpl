@@ -10,7 +10,9 @@
 <item>
 <name>{{msg[1][6]}}</name>
 <title>{{msg[1][6]}}</title>
-%body = "<b>%s</b> to <b>%s</b><br><br>%s" % (msg[1][3], msg[1][5], api.body_render("\n".join(msg[1][8:])))
+%f = msg[1][3].replace("<", "&lt;").replace(">", "&gt;")
+%t = msg[1][5].replace("<", "&lt;").replace(">", "&gt;")
+%body = "<b>%s</b> to <b>%s</b><br><br>%s" % (f, t, api.body_render("\n".join(msg[1][8:])))
 <description>{{body}}</description>
 %time = api.rss_time(msg[1][2])
 <pubDate>{{time}}</pubDate>
