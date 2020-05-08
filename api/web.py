@@ -186,6 +186,7 @@ def subscriptions():
     if auth:
         subscription.append(["mail.to@"+auth, i18n.tr("Received")])
         subscription.append(["mail.from@"+auth, i18n.tr("Sent")])
+        subscription.append(["net.mail@"+auth, i18n.tr("Private")])
 
     return subscription
 

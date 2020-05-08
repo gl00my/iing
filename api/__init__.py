@@ -653,34 +653,46 @@ def mail_decode(auth):
         return arg
     return username
 
+def null_get_time(m):
+    return 0
+
 def netmail_last_msgid(auth):
+    username, addr = points.check_point(auth)
+    if username == "":
+        return False
+    addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
         c = connect()
-        return c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
+        return c.execute("SELECT msgid FROM msg WHERE ( echoarea LIKE 'private%' and ( t = ? or t like ?)) ORDER BY id DESC LIMIT 1;", (username, addr)).fetchone()[0]
     except:
         return False
 
 def netmail_echo_msgids(auth):
     msgids = []
+    username, addr = points.check_point(auth)
+    if username == "":
+            return msgids
+    addr = "%<" + nodename + "," + str(addr) + ">%"
     c = connect()
-    for row in c.execute("SELECT msgid, t FROM msg WHERE t like '%<%>%' ORDER BY id;"):
+    for row in c.execute("SELECT msgid FROM msg WHERE ( echoarea LIKE 'private%' and (t = ? or t like ?)) ORDER BY id;", (username, addr)):
         msgids.append(row[0])
     return msgids
 
 def netmail_echoarea_count(auth):
     r = 0
+    username, addr = points.check_point(auth)
+    if username == "":
+            return r
+    addr = "%<" + nodename + "," + str(addr) + ">%"
     try:
         c = connect()
-        q = c.execute("SELECT msgid FROM msg WHERE t like '%<%>%'  ORDER BY id DESC LIMIT 1;").fetchone()[0]
+        q = c.execute("SELECT msgid FROM msg WHERE ( echoarea LIKE 'private%' and (t = ? or t like ?));", (username, addr))
     except:
         return 0
     for row in q:
         r += 1
     return r
 
-
-def null_get_time(m):
-    return 0
 
 virtual_ea = {
     '.query' : {
@@ -707,10 +719,12 @@ virtual_ea = {
         'get_echo_msgids': from_echo_msgids,
         'get_echoarea_count': from_echoarea_count,
     },
-#    'net.mail' : {
-#        'name': 'netmail',
-#        'get_last_msgid': netmail_last_msgid,
-#        'get_echo_msgids': netmail_echo_msgids,
-#        'get_echoarea_count': netmail_echoarea_count,
-#    },
+    'net.mail' : {
+        'name': 'Private',
+        'decode': mail_decode,
+        'get_time': null_get_time,
+        'get_last_msgid': netmail_last_msgid,
+        'get_echo_msgids': netmail_echo_msgids,
+        'get_echoarea_count': netmail_echoarea_count,
+    },
 }
