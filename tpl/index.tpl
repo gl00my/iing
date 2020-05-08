@@ -26,8 +26,8 @@
 </script>
 
 <div id="panel">
-<span id="container"><h3 id="nodedsc"><a href="/"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
-<a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
+<span id="container"><h3 id="nodedsc"><a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
+<a href="/"><img src="/lib/idec_grey.png" width="20"> {{dsc}}</a></h3></span>
 <div id="rbuttons">
 <a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> {{i18n.tr("Favorites")}}</span></a>
 <a href="https://instead-hub.github.io/page/club/" class="button"><i class="fa fa-info-circle"></i><span class="caption"> {{i18n.tr("About")}}</span></a>

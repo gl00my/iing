@@ -456,7 +456,7 @@ textarea {
 
 @media all and (max-width: 600px) {
     .caption, #container {
-	display: none !important;
+//	display: none !important;
     }
     #side-menu {
 	display: none;
