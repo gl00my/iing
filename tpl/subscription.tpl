@@ -5,7 +5,7 @@
 <div id="buttons">
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 </div>
-<span class="caption"><h3>{{i18n.tr("Edit subscriptions")}}</h3></span>
+<span><h3>{{i18n.tr("Edit subscriptions")}}</h3></span>
 </div><br>
 
 <center>

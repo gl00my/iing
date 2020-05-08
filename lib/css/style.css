@@ -455,8 +455,8 @@ textarea {
 }
 
 @media all and (max-width: 600px) {
-    .caption, #container {
-//	display: none !important;
+    .caption {
+	display: none !important;
     }
     #side-menu {
 	display: none;
@@ -486,11 +486,11 @@ textarea {
 	min-width: 150px;
 	max-width: 350px;
     }
-    .files {
-	display: none;
-    }
     .mfiles {
-	display: block;
+//	display: block;
+    }
+    .files {
+//	display: none;
     }
 }
 

@@ -6,7 +6,7 @@
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 </div>
-<h3><span class="caption"><i class="fa fa-comments"></i> {{echoarea[2]}}: {{echoarea[1]}}</span></h3>
+<h3><span><i class="fa fa-comments"></i> {{echoarea[2]}}: {{echoarea[1]}}</span></h3>
 <div id="rbuttons">
 <form id="search" class="query" method="get" action="/search/{{echoarea[0]}}"><input class="input_line" name="regexp" placeholder="regexp" value="" type="text"/></form>
 <a href="/rss/{{echoarea[0]}}" class="button"><i class="fa fa-rss"></i><span class="caption"> RSS</span></a>

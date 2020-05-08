@@ -40,7 +40,6 @@
 </tr>
 %end
 </table>
-</div>
 
 <div id="conferences" class="mfiles">
 <table border="0" cellpadding="0" cellspacing="0" id="filelist">
@@ -74,6 +73,9 @@
 </table>
 </div>
 </div>
+
+</div>
+
 <br><br>
 
 %include tpl/footer.tpl

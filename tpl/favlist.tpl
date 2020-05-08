@@ -5,7 +5,7 @@
 <div id="buttons">
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 </div>
-<h3><span class="caption">{{i18n.tr('Favorites')}}</span></h3>
+<h3><span>{{i18n.tr('Favorites')}}</span></h3>
 </div><br>
 
 <div id="content">

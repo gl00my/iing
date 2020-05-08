@@ -5,7 +5,7 @@
 <div id="buttons">
 <a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
 </div>
-<h3><span class="caption">{{echoarea[1]}}</span></h3>
+<h3><span>{{echoarea[1]}}</span></h3>
 <div id="rbuttons">
 %if msgid:
 <a href="/favlist/{{echoarea[0]}}" class="button"><i class="fa fa-arrow-circle-left"></i><span class="caption"> {{i18n.tr('Back')}}</span></a>

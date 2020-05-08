@@ -3,7 +3,7 @@
 
 <div id="panel">
 <div id="buttons">
-<a href="/" class="button"><i class="fa fa-home"></i><span class="caption"> {{i18n.tr("Home")}}</span></a>
+<a href="/" class="button"><i class="fa fa-home"></i><span> {{i18n.tr("Home")}}</span></a>
 </div>
 <h3>{{i18n.tr("Authorization")}}</h3>
 </div><br>
