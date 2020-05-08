@@ -9,7 +9,8 @@
 </div><br>
 
 <center>
-<div id="subscriptions" cellpadding="0">
+<div id="edit" cellpadding="0">
+<div class='width90'>
 <table cellpadding="0" cellspacing="0" border="0" id="echolist">
 %for echoarea in echoareas:
 <tr>
@@ -34,6 +35,7 @@
 <label><input type="checkbox" name="default" value="1">{{i18n.tr("Add all conferences")}}</label><br><br>
 <button class="form-button">{{i18n.tr("Save")}}</button>
 </form>
+</div>
 </div>
 </center>
 <br>

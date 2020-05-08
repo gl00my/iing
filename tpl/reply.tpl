@@ -28,7 +28,7 @@
 <h3><span class="caption">{{title}}</span></h3>
 </div>
 <br>
-<div id="conferences" class="width90">
+<div id="edit">
 
 %if msg:
 <div class="single-message reply">
@@ -73,7 +73,7 @@
 <hr/>
 <h2>{{i18n.tr('Help')}}</h2>
 
-<div class='help'>
+<div class='width90 left'>
 
 <div class='help-item'>
 <h3>{{i18n.tr('Code blocks')}}</h3>
@@ -93,7 +93,7 @@ end
 > sed do eiusmod tempor incididunt ut labore et dolore magna<br>
 
 </div>
-<div align="left" style="display: inline-block">
+<div align="left" class="help-item" style="display: inline-block">
 
 <h3>{{i18n.tr('Spoilers')}}</h3>
 Open text...<br>

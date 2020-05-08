@@ -8,7 +8,8 @@
 <h3>{{i18n.tr("Files")}}</h3>
 </div><br>
 
-<div id="conferences" class="width90 files">
+<div id="edit" class="files">
+<div class='width90'>
 <table border="0" cellpadding="0" cellspacing="0" id="filelist">
 %if d:
 <tr><td><a href="/s/filelist">../</a></td><td></td><td></td></tr>
@@ -72,7 +73,7 @@
 %end
 </table>
 </div>
-
+</div>
 <br><br>
 
 %include tpl/footer.tpl

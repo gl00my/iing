@@ -566,7 +566,7 @@ def login():
     auth = points.login(username, password)
     if auth:
         if auth != "error":
-            response.set_cookie("authstr", auth, path="/", max_age=3600000000)
+            response.set_cookie("authstr", auth, path="/", max_age=360000000)
             redirect("/")
         else:
             return template("tpl/login.tpl", nodename=api.nodename, dsc=api.nodedsc, background=api.background, username=username, auth=auth, registration=api.registration, alarm=i18n.tr("Wrong username or password!"))

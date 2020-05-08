@@ -6,18 +6,22 @@ html, body {
 }
 
 #content {
-    width: 95%;
+    width: 100%;
     min-width: 700px;
     max-width: 1024px;
     min-height: 100%;
 }
 
+#main {
+    max-width: 1024px;
+}
+
 #panel {
-    background: #333333;
-    color: #dddddd;
+    background: #008cba;
+    color: #fff;
     margin: 0;
     text-align: left;
-    height: 40pt;
+    max-width: 100%;
 }
 
 #panel h3 {
@@ -27,14 +31,11 @@ html, body {
 }
 
 #panel a {
-    color: #dddddd;
+    color: #fff;
     text-decoration: none;
 }
 
 #container {
-    display: inline-block;
-    position: absolute;
-    width: 50%;
     z-index: 0;
 }
 
@@ -46,16 +47,12 @@ html, body {
 }
 
 #rbuttons {
-    position: absolute;
-    right: 0;
-    top: 0;
-    float: right;
-    font-size: 0;
-    z-index: 10;
+    background: #666666;
+    width: 100%;
+    text-align: right;
 }
 
 .button {
-    background: #333333;
     display: inline-block;
     font-size: 11pt;
     line-height: 40pt;
@@ -68,7 +65,6 @@ html, body {
 }
 
 .query {
-    background: #333333;
     display: inline-block;
     font-size: 11pt;
     line-height: 40pt;
@@ -115,7 +111,7 @@ a {
 
 .echo-title {
     display: inline-block;
-    background: #e7e7e7;
+    background: #def0fc;
     padding: 5px;
     margin-bottom: 1px;
     border: 1px solid #585858;
@@ -126,12 +122,16 @@ a {
 }
 
 .message, .single-message {
-    background: #e7e7e7;
+    background: #def0fc;
     padding: 15px;
     border: 1px solid #585858;
     line-height: 1.5;
     word-wrap: break-word;
     text-align: left;
+}
+
+.reply {
+    margin: 0px 20px;
 }
 
 .current-message {
@@ -140,7 +140,6 @@ a {
 
 .message {
     width: 90%;
-    max-width: 700px;
 }
 
 .msglist {
@@ -175,14 +174,15 @@ hr {
 }
 
 #side-menu {
-    width: 200px;
-    padding-right: 20px;
 }
 
-#conferences, #subscriptions, #keys {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 5px 10px;
+#conferences {
+}
+
+#edit, #subscriptions, #keys {
+    background-color: rgba(255, 255, 232, 0.9);
     border: 1px solid #585858;
+    max-width: 1024px;
 }
 
 #subscriptions {
@@ -220,9 +220,9 @@ hr {
 }
 
 .echo-button-link {
-    font-weight: bold;
-    background: #666666;
-    color: #eeeeee;
+    font-weight: normal;
+    background: rgba(102, 102, 102, 0.9);
+    color: #fff;
 }
 
 .echo-button-link:hover {
@@ -306,7 +306,7 @@ pre {
 }
 
 .input {
-    background: #e7e7e7;
+    background: #def0fc;
     color: #444444;
     border: 1px solid #AAAAAA;
     width: 80%;
@@ -315,7 +315,7 @@ pre {
 }
 
 textarea {
-    background: #e7e7e7;
+    background: #def0fc;
     color: #444444;
     width: 80%;
     padding: 5px;    
@@ -357,6 +357,11 @@ textarea {
 
 .width90 {
     width: 90%;
+    padding: 8px;
+}
+
+.left {
+    text-align: left;
 }
 
 #filelist tr:hover {
@@ -377,7 +382,7 @@ textarea {
 }
 
 .echorow:hover {
-    background: #eee8d5;
+    background: #ffffe8;
 }
 
 .current-echorow {
@@ -409,7 +414,7 @@ textarea {
 }
 
 .page {
-    background: #e7e7e7;
+    background: #def0fc;
     color: #000000;
     padding: 5px;
     border: 1px solid #585858;
@@ -437,11 +442,11 @@ textarea {
 }
 
 .bbutton {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     color: #000000;
     text-decoration: none;
     padding: 5px 5px;
-    opacity: 0.8;
+    opacity: 0.9;
     font-size: 18pt;
 }
 

@@ -25,3 +25,4 @@
     <i class="fa fa-arrow-circle-up fa-2x bbutton" onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;" title="{{i18n.tr('Top')}}"></i>
     </div>
     <center>
+    <div id='main'>

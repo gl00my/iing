@@ -8,8 +8,8 @@
 <h3>{{i18n.tr("Profile")}}</h3>
 </div><br>
 
-<div id="conferences" class="width90">
-<div align="left">
+<div id="edit">
+<div class="width90 left">
 <b>{{i18n.tr("Login")}}:</b> {{username}}
 <b>Authstr:</b> {{auth}}<br>
 <b>{{i18n.tr("Address")}}:</b> {{nodename}}, {{addr}}<br>

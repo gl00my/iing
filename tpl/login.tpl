@@ -8,7 +8,8 @@
 <h3>{{i18n.tr("Authorization")}}</h3>
 </div><br>
 
-<div id="conferences" class="width90">
+<div id="">
+<div class="width90">
 <h3>{{i18n.tr("Enter username and password")}}</h3>
 %if alarm:
 <span class="alarm">{{alarm}}</span>
@@ -17,9 +18,11 @@
 <input type="text" name="username" class="input input_line login" placeholder="username"><br>
 <input type="password" name="password" class="input input_line login" placeholder="password"><br>
 <button class="form-button">{{i18n.tr("Log in")}}</button>
+</div>
+</form>
 %if registration:
+<br>
 <a class="form-button" href="/registration">{{i18n.tr('Register')}}</a>
 %end
-</form>
 </div>
 %include tpl/footer.tpl
