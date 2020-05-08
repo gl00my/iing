@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 
 import urllib.request, base64, codecs, re, os, sys, pickle, sqlite3
 
@@ -85,9 +85,12 @@ def check_features():
 def load_counts():
     global counts
     if os.path.exists("counts.lst"):
-        f = open("counts.lst", "rb")
-        counts = pickle.load(f)
-        f.close()
+        try:
+            f = open("counts.lst", "rb")
+            counts = pickle.load(f)
+            f.close()
+        except:
+            counts[node] = {}
     else:
         counts[node] = {}
     if not node in counts:

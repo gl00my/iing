@@ -30,7 +30,7 @@
 <a href="/echolist" id="echolist-button" class="button"><i class="fa fa-bars"></i></a>
 <div id="rbuttons">
 <a href="favorites" class="button"><i class="fa fa-heart"></i><span class="caption"> {{i18n.tr("Favorites")}}</span></a>
-<a href="http://instead.syscall.ru/ru/club" class="button"><i class="fa fa-info-circle"></i><span class="caption"> {{i18n.tr("About")}}</span></a>
+<a href="https://instead-hub.github.io/page/club/" class="button"><i class="fa fa-info-circle"></i><span class="caption"> {{i18n.tr("About")}}</span></a>
 %if not nosubscription:
 <a href="/s/subscription" class="button"><i class="fa fa-paper-plane"></i><span class="caption"> {{i18n.tr("Subscriptions")}}</span></a>
 %end

@@ -424,6 +424,7 @@ def body_render(body):
             pre = 0
             txt += "====</pre>\n"
         elif pre == 1:
+            line = line.replace("<", "&lt;").replace(">", "&gt;")
             txt += line_wrap(line) + "\n"
         else:
             txt += line_render(line) + "<br>\n"
@@ -693,7 +694,7 @@ virtual_ea = {
     'mail.to' : {
         'name': 'To',
         'decode': mail_decode,
-        'get_time': mail_get_time,
+        'get_time': null_get_time,
         'get_last_msgid': mail_last_msgid,
         'get_echo_msgids': mail_echo_msgids,
         'get_echoarea_count': mail_echoarea_count,

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 
 import api, points, base64, time, codecs, os, hashlib
 from api.bottle import *
@@ -52,7 +52,8 @@ def index_list(names):
                     msglist = api.get_echoarea(echoarea)[ss:ss + e]
             else:
                 msglist = api.get_echoarea(echoarea)
-            result = result + "\n".join(msglist) + "\n"
+            if len(msglist) > 0:
+                result = result + "\n".join(msglist) + "\n"
         except: result = result + ""
     return result
 
