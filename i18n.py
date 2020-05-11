@@ -3,6 +3,7 @@ from threading import Thread, local
 
 t = {
     'en': {
+        'Home': '',
     },
     'ru': {
         'Profile': 'Профиль',
@@ -39,7 +40,7 @@ t = {
         'Blacklist': 'Черный список',
         'Next': 'Следующее сообщение',
         'Prev': 'Предыдущее сообщение',
-        'Home': 'В начало',
+        'Home': '',
         'End': 'В конец',
         'Enter the text body': 'Введите текст сообщения',
         'auth-key': 'auth-ключ',

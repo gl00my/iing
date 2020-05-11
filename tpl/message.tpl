@@ -9,7 +9,7 @@
 %if feed == 1:
 <a href="/{{echoarea[0]}}/{{page}}/{{msgid}}#{{msgid}}"><h3><i class="fa fa-comments"></i><span class="caption"> {{echoarea[0]}}: {{echoarea[1]}}</span></h3></a>
 %else:
-<h3><span class="caption"><i class="fa fa-comments"></i> {{echoarea[0]}}: {{echoarea[1]}}</span></h3>
+<h3><span><i class="fa fa-comments"></i> {{echoarea[0]}}: {{echoarea[1]}}</span></h3>
 %end
 <div id="rbuttons">
 <form id="search" class="query" method="get" action="/search/{{echoarea[0]}}"><input class="input_line" id="query" name="regexp" placeholder="regexp" value="" type="text"/></form>

@@ -20,7 +20,7 @@ html, body {
     background: #008cba;
     color: #fff;
     margin: 0;
-    text-align: left;
+//    text-align: left;
     max-width: 100%;
 }
 
@@ -46,8 +46,15 @@ html, body {
     padding: 0;
 }
 
+#rbutton {
+    float: right;
+    font-size: 0;
+    margin: 0;
+    padding: 0;
+}
+
 #rbuttons {
-    background: #666666;
+    background: #2c6784;
     width: 100%;
     text-align: center;
 }
@@ -183,7 +190,9 @@ hr {
     background-color: rgba(255, 255, 232, 0.9);
     border: 1px solid #585858;
     max-width: 1024px;
+    padding: 20px 0 20px 0;
 }
+
 
 #subscriptions {
     width: 90%;
@@ -202,11 +211,11 @@ hr {
 }
 
 .new-button-link {
-    font-size: 10pt;
+//    font-size: 10pt;
     display: inline-block;
     background: #43ac6a;
     color: #ffffff;
-    width: 170px;
+    width: 200px;
     padding: 5px 20px;
     text-align: left;
     text-decoration: none;
